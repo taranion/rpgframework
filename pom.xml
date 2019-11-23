@@ -162,6 +162,7 @@
 		<snapshotRepository>
 			<id>google</id>
 			<url>https://rpgframework-maven-repository.appspot.com/</url>
+			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
 
