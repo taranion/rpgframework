@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="DEBUG"/>
+             <PatternLayout   pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%c] (%F:%L) - %m%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="babylon" level="debug" />
+        <Root level="debug" additivity="false">
+            <appender-ref ref="console" />
+        </Root>
+    </Loggers>
+</Configuration>

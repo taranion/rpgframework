@@ -1,0 +1,47 @@
+plugins {
+    // Apply the java-library plugin to add support for Java Library
+    id 'java-library'
+    id 'eclipse'
+    id 'maven-publish'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'de.rpgframework'
+            artifactId 'rpgframework-core'
+            version '4.0'
+
+            from components.java
+        }
+    }
+}
+jar{
+    manifest {
+        attributes 'Implementation-Title': 'Example Project',
+                   'Implementation-Version': '1.0.0'    
+    }
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // This dependency is exported to consumers, that is to say found on their compile classpath.
+    api 'org.apache.logging.log4j:log4j-api:2.11.1'
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation 'org.apache.logging.log4j:log4j-core:2.11.1'
+
+    // Use JUnit test framework
+//    testImplementation 'junit:junit:4.12'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/api','src/main/impl']
+            srcDir 'src/main/resources'
+         }
+    }
+}
