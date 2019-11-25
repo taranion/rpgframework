@@ -11,6 +11,7 @@ module de.rpgframework.core {
 	exports de.rpgframework.sound;
 
 	uses de.rpgframework.RPGFrameworkPlugin;
+	uses de.rpgframework.RPGFramework;
 
 	requires java.prefs;
 	requires java.sql;
