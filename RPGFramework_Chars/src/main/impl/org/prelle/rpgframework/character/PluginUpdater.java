@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -220,13 +221,26 @@ public class PluginUpdater {
 	//-------------------------------------------------------------------
 	private static List<PluginDescriptor> getLocallyAvailablePlugins() {
 		List<PluginDescriptor> ret = new ArrayList<>();
-		logger.debug("Get list of already installed plugins in "+pluginDir);
 		try {
 			// Ensure directory exists
 			if (!Files.exists(pluginDir)) {
 				logger.debug("Plugin directory missing - create "+pluginDir);
-				Files.createDirectories(pluginDir);
+				try {
+					Files.createDirectories(pluginDir);
+				} catch (AccessDeniedException e) {
+					logger.warn("Failed creating plugin directory: Access denied");
+					pluginDir = Path.of(System.getProperty("user.home"), "plugins");
+					if (!Files.exists(pluginDir)) {
+						Files.createDirectories(pluginDir);
+					}
+				}
+			} else if (!Files.isWritable(pluginDir)) {
+				pluginDir = Path.of(System.getProperty("user.home"), "plugins");
+				if (!Files.exists(pluginDir)) {
+					Files.createDirectories(pluginDir);
+				}
 			}
+			logger.debug("Get list of already installed plugins in "+pluginDir);
 			
 			Files.newDirectoryStream(pluginDir, "*.jar").forEach(jarPath -> {
 				logger.debug("JAR "+jarPath);
