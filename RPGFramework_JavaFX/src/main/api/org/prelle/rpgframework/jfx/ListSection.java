@@ -2,14 +2,13 @@ package org.prelle.rpgframework.jfx;
 
 import java.util.List;
 import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.prelle.javafx.ScreenManagerProvider;
 import org.prelle.javafx.SymbolIcon;
-import org.prelle.rpgframework.jfx.SingleSection;
 
+import de.rpgframework.ResourceI18N;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -49,8 +48,8 @@ public abstract class ListSection<T> extends SingleSection {
 		list = new ListView<T>();
 		setDeleteButton( new Button(null, new SymbolIcon("delete")) );
 		setAddButton( new Button(null, new SymbolIcon("add")) );
-		getDeleteButton().setTooltip(new Tooltip(RES.getString("button.delete.tooltip")));
-		getAddButton().setTooltip(new Tooltip(RES.getString("button.add.tooltip")));
+		getDeleteButton().setTooltip(new Tooltip(ResourceI18N.get(RES,"button.delete.tooltip")));
+		getAddButton().setTooltip(new Tooltip(ResourceI18N.get(RES,"button.add.tooltip")));
 		getDeleteButton().setDisable(true);
 		settingsButtonProperty().addListener( (ov,o,n) -> {
 			if (o!=null)

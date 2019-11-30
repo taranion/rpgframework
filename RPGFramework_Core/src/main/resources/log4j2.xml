@@ -8,8 +8,10 @@
     </Appenders>
     <Loggers>
         <Logger name="babylon" level="debug" />
+        <Logger name="babylon.chars" level="info" />
         <Root level="debug" additivity="false">
             <appender-ref ref="console" />
         </Root>
+        <Logger name="xml" level="warn" />
     </Loggers>
 </Configuration>

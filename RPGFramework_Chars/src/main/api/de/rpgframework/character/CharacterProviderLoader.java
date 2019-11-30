@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+
 import de.rpgframework.core.RoleplayingSystem;
 
 /**
@@ -28,12 +30,14 @@ public class CharacterProviderLoader {
 	//--------------------------------------------------------------------
 	public static void setCharacterProvider(CharacterProvider service) {
 		charProv = service;
+		LogManager.getLogger("babylon.chars").debug("*********************************************Set CharacterProvider "+service);
 	}
 
 	//--------------------------------------------------------------------
 	public static void registerRulePlugin(RulePlugin<?> plugin) {
 		if (rulePlugins.containsKey(plugin.getRules()))
 			throw new IllegalStateException("Already registered a plugin for "+plugin.getRules());
+		LogManager.getLogger("babylon.chars").debug("Register plugin "+plugin);
 		rulePlugins.put(plugin.getRules(), plugin);
 	}
 

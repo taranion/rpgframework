@@ -146,7 +146,7 @@ public class PluginRegistry {
 				plugins.add(plugin);
 
 			});
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.fatal("Failed loading plugin(s) from "+jarFile,e);
 		}
 

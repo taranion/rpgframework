@@ -149,6 +149,10 @@ public class PluginUpdater {
 			List<String> doc =
 				      new BufferedReader(new InputStreamReader(con.getInputStream(),
 				          StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
+			if (logger.isTraceEnabled()) {			
+				for (String line : doc)
+					logger.trace(line);
+			}
 			
 			class JarAndManifest {
 				URL jar;
@@ -317,9 +321,13 @@ public class PluginUpdater {
 		
 		// Add local plugins to classpath
 		for (PluginDescriptor pluginDesc : installed) {
-			for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
-				logger.info("Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
-				CharacterProviderLoader.registerRulePlugin(plugin);
+			try {
+				for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
+					logger.info("Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+					CharacterProviderLoader.registerRulePlugin(plugin);
+				}
+			} catch (Exception e) {
+				logger.error("Failed loading plugins from "+pluginDesc.localFile,e);
 			}
 		}
 	}
