@@ -12,6 +12,7 @@ module de.rpgframework.core {
 
 	uses de.rpgframework.RPGFrameworkPlugin;
 	uses de.rpgframework.RPGFramework;
+	uses org.prelle.rpgframework.BabylonPlugin;
 
 	requires java.prefs;
 	requires java.sql;

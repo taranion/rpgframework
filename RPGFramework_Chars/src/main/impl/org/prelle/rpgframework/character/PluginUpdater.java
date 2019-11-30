@@ -28,6 +28,7 @@ import org.prelle.rpgframework.character.PluginRegistry.UpdateResult;
 
 import de.rpgframework.ExitCodes;
 import de.rpgframework.RPGFrameworkConstants;
+import de.rpgframework.character.CharacterProviderLoader;
 import de.rpgframework.character.RulePlugin;
 
 /**
@@ -318,6 +319,7 @@ public class PluginUpdater {
 		for (PluginDescriptor pluginDesc : installed) {
 			for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
 				logger.info("Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+				CharacterProviderLoader.registerRulePlugin(plugin);
 			}
 		}
 	}
