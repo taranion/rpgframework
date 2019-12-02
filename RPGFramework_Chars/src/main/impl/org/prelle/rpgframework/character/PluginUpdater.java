@@ -5,14 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +22,12 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.prelle.rpgframework.character.PluginRegistry.PluginDescriptor;
 import org.prelle.rpgframework.character.PluginRegistry.UpdateResult;
 
 import de.rpgframework.ExitCodes;
 import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.character.CharacterProviderLoader;
+import de.rpgframework.character.PluginDescriptor;
 import de.rpgframework.character.RulePlugin;
 
 /**
@@ -338,7 +336,7 @@ public class PluginUpdater {
 			try {
 				for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
 					logger.info("Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
-					CharacterProviderLoader.registerRulePlugin(plugin);
+					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
 				}
 			} catch (Exception e) {
 				logger.error("Failed loading plugins from "+pluginDesc.localFile,e);

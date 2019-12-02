@@ -8,7 +8,7 @@
     </Appenders>
     <Loggers>
         <Logger name="babylon" level="debug" />
-        <Logger name="babylon.chars" level="info" />
+        <Logger name="babylon.chars" level="debug" />
         <Root level="debug" additivity="false">
             <appender-ref ref="console" />
         </Root>

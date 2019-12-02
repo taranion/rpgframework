@@ -27,6 +27,9 @@ public interface RPGFramework {
 	public final static String PROP_LAST_SAVE_PRINT_DIR = "print";
 
 	//-------------------------------------------------------------------
+	public void addStepDefinition(StandardBootSteps def, BootStep step);
+
+	//-------------------------------------------------------------------
 	public void addBootStep(StandardBootSteps roleplayingSystems);
 
 	//-------------------------------------------------------------------

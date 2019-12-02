@@ -32,6 +32,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ExitCodes;
+import de.rpgframework.character.PluginDescriptor;
+import de.rpgframework.character.PluginState;
 import de.rpgframework.character.RulePlugin;
 
 /**
@@ -40,35 +42,10 @@ import de.rpgframework.character.RulePlugin;
  */
 public class PluginRegistry {
 
-	public static enum PluginState {
-		ALPHA,
-		BETA,
-		ACTIVE,
-		ABANDONED,
-	}
-	
 	public static enum UpdateResult {
 		UPDATED,
 		FAILED,
 		VERIFICATION_FAILED
-	}
-
-	static class PluginDescriptor {
-		public URL location;
-		public String filename;
-		public String name;
-		public String vendor;
-		public String version;
-		public Instant timestamp;
-		public int fileSize;
-		public PluginState state;
-		public URL homepage;
-		public URL bugtracker;
-		public String toString() {
-			return "Plugin(filename="+filename+", name="+name+", vendor="+vendor+", version="+version+", size="+fileSize+", time="+timestamp+", state="+state+")";
-		}
-		public transient Path localFile; 
-		public transient UpdateResult result;
 	}
 
 	private final static Logger logger = LogManager.getLogger("rpgframework");

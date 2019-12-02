@@ -5,11 +5,9 @@ package org.prelle.rpgframework;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +42,6 @@ public class RPGFrameworkImpl implements RPGFramework {
 //	private FunctionMediaLibraries    mediaLibraries;
 	private LicenseManager license;
 
-	private List<BabylonPlugin> babylonPlugins;
 	private Map<StandardBootSteps, BootStep> stepDefinitions;
 	private List<StandardBootSteps> requestedSteps;
 	private List<BootStep> customSteps;
@@ -60,8 +57,6 @@ public class RPGFrameworkImpl implements RPGFramework {
 		requestedSteps = new ArrayList<>();
 		stepDefinitions = new HashMap<>();
 		customSteps = new ArrayList<>();
-		addStepDefinition(StandardBootSteps.FRAMEWORK_PLUGINS, new LoadFrameworkPluginsBootStep(this));
-		babylonPlugins  = new ArrayList<>();
 		try {
 			prepareConfigNode();
 		} catch (Exception e) {
@@ -89,20 +84,6 @@ public class RPGFrameworkImpl implements RPGFramework {
 			logger.info("User chosen locale = "+lang);
 			Locale.setDefault(lang);
 		}
-
-
-		Iterator<BabylonPlugin> it = ServiceLoader.load(BabylonPlugin.class, RPGFrameworkImpl.class.getClassLoader()).iterator();
-		while (it.hasNext()) {
-			try {
-				BabylonPlugin plugin = it.next();
-				logger.info("Found BabylonPlugin "+plugin.getClass()+" for "+plugin.getType());
-				babylonPlugins.add(plugin);
-			} catch (Throwable e) {
-				logger.fatal("Error instantiating plugin",e);
-				e.printStackTrace();
-			}
-		}
-
 
 		RPGFrameworkLoader.setInstance(this);
 	}
@@ -150,17 +131,20 @@ public class RPGFrameworkImpl implements RPGFramework {
 	}
 
 	//-------------------------------------------------------------------
+	@Override
 	public void addStepDefinition(StandardBootSteps def, BootStep step) {
 		logger.debug("  Register "+step+" as "+def);
 		stepDefinitions.put(def, step);
 	}
 
 	//-------------------------------------------------------------------
+	@Override
 	public void addBootStep(StandardBootSteps stepDef) {
 		requestedSteps.add(stepDef);
 	}
 
 	//-------------------------------------------------------------------
+	@Override
 	public void addBootStep(BootStep step) {
 		customSteps.add(step);
 	}
@@ -181,22 +165,14 @@ public class RPGFrameworkImpl implements RPGFramework {
 		try {
 		if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().message("Initialize framework");
 //		if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().progressChanged(0.75);
+//		addStepDefinition(StandardBootSteps.FRAMEWORK_PLUGINS, new LoadFrameworkPluginsBootStep(this));
 
 		/*
-		 * Initialize babylon plugins
+		 * 1. Load all framework plugins
 		 */
-		logger.info("1. Initialize BabylonPlugins");
-		for (BabylonPlugin plugin : babylonPlugins) {
-			logger.debug(" * START: init "+plugin.getClass());
-			try {
-				plugin.initialize(this, configRoot, callback, new ArrayList<>());
-			} catch (Exception e) {
-				logger.fatal("Failed initializing plugin "+plugin.getClass(),e);
-			} finally {
-				logger.debug("   STOP : init "+plugin.getClass());
-			}
-		}
-
+		logger.info("1. Load framework plugins");
+		(new LoadFrameworkPluginsBootStep(this)).execute(callback);
+		
 		/*
 		 * Translate Bootstep definitions to Bootstep implementations
 		 */
