@@ -273,19 +273,20 @@ public class LoadRulePluginsBootStep implements BootStep {
 					if (callback!=null)
 						callback.message("Initialize "+plugin.getClass().getSimpleName());
 					double percBefore = ((double)successful.size()) / ((double)rulePlugins.size());
-					double percent = ((double)successful.size()) / ((double)rulePlugins.size());
+					final double percent = ((double)successful.size()+1) / ((double)rulePlugins.size());
 					plugin.init( (perc) -> {
-						logger.info("    ..."+perc);
 						if (callback!=null) {
-							double relPerc = ((percent-percBefore)/100.0 * perc) + percBefore;
+							double relPerc = ((percent-percBefore) * perc) + percBefore;
+							logger.debug("  "+relPerc);
 							callback.progressChanged(relPerc);
 						}
 					});
 					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
 					changed = true;
 					successful.add(plugin);
+					double perc2 = ((double)successful.size()) / ((double)rulePlugins.size());
 					if (callback!=null)
-						callback.progressChanged(0.5*percent);
+						callback.progressChanged(perc2);
 				} catch (Throwable e) {
 					System.err.println("Error loading plugin: "+e);
 					e.printStackTrace();
