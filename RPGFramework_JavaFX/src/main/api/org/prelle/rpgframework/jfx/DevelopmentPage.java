@@ -10,6 +10,7 @@ import org.prelle.javafx.AppBarButton;
 import org.prelle.javafx.AppBarToggleButton;
 import org.prelle.javafx.SymbolIcon;
 
+import de.rpgframework.ResourceI18N;
 import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.genericrpg.HistoryElement;
 import de.rpgframework.genericrpg.modification.Modification;
@@ -63,16 +64,16 @@ public abstract class DevelopmentPage extends CharacterDocumentView {
 	//--------------------------------------------------------------------
 	private void initComponents() {
 		order = SortOrder.OLDEST_FIRST;
-		history = new HistoryElementSection(this, UI.getString("label.development"), UI, converter, rules);
+		history = new HistoryElementSection(this, ResourceI18N.get(UI, "label.development"), UI, converter, rules);
 
 		/*
 		 * Add Button for XP
 		 */
-		btnAddExp = new AppBarButton(UI.getString("label.addreward"), new SymbolIcon("add"));
+		btnAddExp = new AppBarButton(ResourceI18N.get(UI, "label.addreward"), new SymbolIcon("add"));
 
 		btnSort = new AppBarToggleButton(order.toString(), new SymbolIcon("sort"));
 
-		cbAggregate = new AppBarToggleButton(UI.getString("screen.development.aggregate"), new SymbolIcon("backtowindow"));
+		cbAggregate = new AppBarToggleButton(ResourceI18N.get(UI, "screen.development.aggregate"), new SymbolIcon("backtowindow"));
 	}
 
 	//-------------------------------------------------------------------

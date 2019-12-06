@@ -196,33 +196,56 @@ public class LoadRulePluginsBootStep implements BootStep {
 		// All plugins are considered NOT_LOADED until they are
 		List<RulePlugin<?>> notLoaded  = new ArrayList<>(acceptedRulePlugins);
 		List<RulePlugin<?>> successful = new ArrayList<>();
-		// Load Plugins with identifier CORE and feature PERSISTENCE first
-		logger.debug("Load all CORE plugins first");
-		for (RulePlugin<?> plugin : notLoaded) {
-			if (plugin.getID().equals("CORE") && plugin.getSupportedFeatures().contains(RulePluginFeatures.PERSISTENCE)) {
-				Package pack = plugin.getClass().getPackage();
-				try {
-					logger.debug("Initialize "+plugin.getClass()+" // "+pack.getImplementationTitle()+" // "+pack.getImplementationVersion());
-					if (callback!=null)
-						callback.message("Initialize CORE plugin "+plugin.getClass().getSimpleName());
-					plugin.init();
-					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
-					successful.add(plugin);
-					double percent = ((double)successful.size()) / ((double)rulePlugins.size());
-					if (callback!=null)
-						callback.progressChanged(0.5*percent);
-				} catch (Throwable e) {
-					System.err.println("Error loading plugin: "+e);
-					e.printStackTrace();
-					logger.fatal("Error loading plugin: "+e,e);
-					if (callback!=null)
-						callback.errorOccurred("RPGFrameworkLoader", "Error loading plugin "+plugin.getID(), e);
+		// Sort in a way, that plugins without requirements come first
+		Collections.sort(notLoaded, new Comparator<RulePlugin<?>>() {
+			public int compare(RulePlugin<?> o1, RulePlugin<?> o2) {
+				if (o1.getRequiredPlugins()==null || o1.getRequiredPlugins().isEmpty()) {
+					if (o2.getRequiredPlugins()!=null || !o2.getRequiredPlugins().isEmpty())
+						return -1;
+					return 0;
 				}
-			} else
-				logger.debug("  not a CORE plugin: "+plugin.getClass()+"  "+plugin.getID()+" / "+plugin.getSupportedFeatures());
-		}
-		notLoaded.removeAll(successful);
-		logger.debug("Successfully loaded "+successful.size()+" CORE plugins");
+				if (o2.getRequiredPlugins()==null || o2.getRequiredPlugins().isEmpty()) {
+					return -1;
+				}
+				return 0;
+			}
+		});
+		
+		
+//		// Load Plugins with identifier CORE and feature PERSISTENCE first
+//		logger.debug("Load all CORE plugins first");
+//		for (RulePlugin<?> plugin : notLoaded) {
+//			if (plugin.getID().equals("CORE") && plugin.getSupportedFeatures().contains(RulePluginFeatures.PERSISTENCE)) {
+//				Package pack = plugin.getClass().getPackage();
+//				try {
+//					logger.info("Initialize "+plugin.getClass()+" // "+pack.getImplementationTitle()+" // "+pack.getImplementationVersion());
+//					if (callback!=null)
+//						callback.message("Initialize CORE plugin "+plugin.getClass().getSimpleName());
+//					double percBefore = ((double)successful.size()) / ((double)rulePlugins.size());
+//					double percent = ((double)successful.size()) / ((double)rulePlugins.size());
+//					plugin.init( (perc) -> {
+//						logger.info("    ..."+perc);
+//						if (callback!=null) {
+//							double relPerc = ((percent-percBefore)/100.0 * perc) + percBefore;
+//							callback.progressChanged(relPerc);
+//						}
+//					});
+//					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
+//					successful.add(plugin);
+//					if (callback!=null)
+//						callback.progressChanged(0.5*percent);
+//				} catch (Throwable e) {
+//					System.err.println("Error loading plugin: "+e);
+//					e.printStackTrace();
+//					logger.fatal("Error loading plugin: "+e,e);
+//					if (callback!=null)
+//						callback.errorOccurred("RPGFrameworkLoader", "Error loading plugin "+plugin.getID(), e);
+//				}
+//			} else
+//				logger.debug("  not a CORE plugin: "+plugin.getClass()+"  "+plugin.getID()+" / "+plugin.getSupportedFeatures());
+//		}
+//		notLoaded.removeAll(successful);
+//		logger.debug("Successfully loaded "+successful.size()+" CORE plugins");
 
 		// Now load rest
 		boolean changed = false;
@@ -249,11 +272,18 @@ public class LoadRulePluginsBootStep implements BootStep {
 				try {
 					if (callback!=null)
 						callback.message("Initialize "+plugin.getClass().getSimpleName());
-					plugin.init();
+					double percBefore = ((double)successful.size()) / ((double)rulePlugins.size());
+					double percent = ((double)successful.size()) / ((double)rulePlugins.size());
+					plugin.init( (perc) -> {
+						logger.info("    ..."+perc);
+						if (callback!=null) {
+							double relPerc = ((percent-percBefore)/100.0 * perc) + percBefore;
+							callback.progressChanged(relPerc);
+						}
+					});
 					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
 					changed = true;
 					successful.add(plugin);
-					double percent = ((double)successful.size()) / ((double)rulePlugins.size());
 					if (callback!=null)
 						callback.progressChanged(0.5*percent);
 				} catch (Throwable e) {

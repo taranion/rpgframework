@@ -22,6 +22,10 @@ import de.rpgframework.core.RoleplayingSystem;
  */
 public interface RulePlugin<C extends RuleSpecificCharacterObject> extends CommandBusListener {
 	
+	public interface RulePluginProgessListener { 
+		public void progressChanged(double percent);
+	}
+	
 	public class PluginKey {
 		String id;
 		RoleplayingSystem rules;
@@ -73,7 +77,7 @@ public interface RulePlugin<C extends RuleSpecificCharacterObject> extends Comma
 	/**
 	 * Start the plugin. This method must not block.
 	 */
-	public void init();
+	public void init(RulePluginProgessListener callback);
 	
 	//--------------------------------------------------------------------
 	/**
