@@ -182,7 +182,7 @@ public class ConfigOptionImpl<T> extends ConfigNodeImpl implements ConfigOption<
 	@SuppressWarnings("unchecked")
 	@Override
 	public void set(Object newVal) {
-		logger.info("set "+newVal);
+		logger.info("set "+this.getName()+" to "+newVal);
 		Preferences PREF = parent.getPreferences();
 		String oldVal = PREF.get(getLocalId(), null);
 		if ((oldVal==null && newVal==null) || (oldVal!=null && newVal!=null && oldVal.equals(newVal)))

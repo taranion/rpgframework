@@ -36,7 +36,7 @@ public class CharacterProviderLoader {
 	public static void registerRulePlugin(RulePlugin<?> plugin, PluginDescriptor descriptor) {
 		if (rulePlugins.containsKey(plugin.getRules()))
 			throw new IllegalStateException("Already registered a plugin for "+plugin.getRules());
-		LogManager.getLogger("babylon.chars").debug("Register plugin "+plugin);
+		LogManager.getLogger("babylon.chars").debug("Register plugin "+plugin.getClass()+" = "+plugin.getReadableName());
 		rulePlugins.put(plugin.getRules(), plugin);
 		descriptors.put(plugin, descriptor);
 	}

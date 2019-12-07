@@ -12,23 +12,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.prelle.rpgframework.character.PluginRegistry.UpdateResult;
 
 import de.rpgframework.ExitCodes;
 import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.character.CharacterProviderLoader;
 import de.rpgframework.character.PluginDescriptor;
+import de.rpgframework.character.PluginRegistry;
 import de.rpgframework.character.RulePlugin;
+import de.rpgframework.character.PluginRegistry.UpdateResult;
 
 /**
  * @author Stefan Prelle
@@ -196,6 +200,10 @@ public class PluginUpdater {
 					descriptor.fileSize = getFileSize(descriptor.location);
 					logger.debug("  Found "+descriptor);
 					ret.add(descriptor);
+					
+					if (descriptor.uuid!=null && PluginRegistry.getRegistered(descriptor.uuid)==null) {
+						PluginRegistry.register(descriptor.uuid, descriptor);
+					}
 				}
 			}
 			
@@ -247,8 +255,13 @@ public class PluginUpdater {
 					PluginDescriptor descr = PluginRegistry.getPluginInfo(url);
 					descr.fileSize = (int) jarPath.toFile().length();
 					descr.localFile= jarPath;
-					logger.debug("  Found installed "+descr);
 					ret.add(descr);
+					if (descr.uuid!=null) {
+						PluginRegistry.register(descr.uuid, descr);
+						logger.debug("  Found installed "+descr.filename);
+					} else {
+						logger.fatal("  Found installed "+descr.filename+" but cannot register it without UUID\n\n");
+					}
 				} catch (Exception e) {
 					logger.error("Error parsing "+jarPath,e);
 				}
@@ -289,8 +302,13 @@ public class PluginUpdater {
 						desc.result = UpdateResult.VERIFICATION_FAILED;
 						return;
 					}
-					// Rename previous
+					// Delete previous
 					Files.deleteIfExists(backupFile);
+					if (desc.localToUpdate!=null) {
+						if (desc.localToUpdate.localFile!=null) {
+							Files.delete(desc.localToUpdate.localFile);
+						}
+					}
 					// Backup previous file
 					if (Files.exists(destFile))
 						Files.move(destFile, backupFile);
@@ -320,27 +338,143 @@ public class PluginUpdater {
 	}
 
 	//-------------------------------------------------------------------
+	private static List<PluginDescriptor> findByUUID(UUID uuid, List<PluginDescriptor> list) {
+		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>();
+		for (PluginDescriptor desc : list) {
+			if (desc.uuid!=null && desc.uuid.equals(uuid))
+				ret.add(desc);
+		}
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
+	private static List<PluginDescriptor> findByName(String name, List<PluginDescriptor> list) {
+		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>();
+		for (PluginDescriptor desc : list) {
+			if (desc.name!=null && desc.name.equals(name))
+				ret.add(desc);
+		}
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
+	private static boolean isNewer(PluginDescriptor check, PluginDescriptor reference) {
+		// Convert version to verify
+		int[] checkNum = new int[3];
+		if (check.version!=null) {
+			StringTokenizer tok = new StringTokenizer(check.version, ".-_");
+			int i=0;
+			while (tok.hasMoreTokens() && i<2) {
+				try {
+					checkNum[i] = Integer.parseInt(tok.nextToken());
+				} catch (NumberFormatException e) {
+					logger.warn("Invalid version of plugin "+check+": "+e);
+				}
+				i++;
+			}
+		}
+		// Convert version to reference
+		int[] refNum = new int[3];
+		if (reference.version!=null) {
+			StringTokenizer tok = new StringTokenizer(reference.version, ".-_");
+			int i=0;
+			while (tok.hasMoreTokens() && i<2) {
+				try {
+					refNum[i] = Integer.parseInt(tok.nextToken());
+				} catch (NumberFormatException e) {
+					logger.warn("Invalid version of plugin "+check+": "+e);
+				}
+				i++;
+			}
+		}
+		
+		logger.debug("Compare "+Arrays.toString(checkNum)+" with "+Arrays.toString(refNum));
+		// Now verify position for position
+		for (int i=0; i<refNum.length; i++) {
+			if (checkNum[i]>refNum[i])
+				return true;
+			if (checkNum[i]<refNum[1])
+				return false;
+		}
+		// Identical versions - compare file dates
+		if (check.timestamp.isAfter(reference.timestamp))
+			return true;
+		return false;
+	}
+
+	//-------------------------------------------------------------------
+	private static PluginDescriptor findNewest(List<PluginDescriptor> allMatchingRemote) {
+		PluginDescriptor newest = null;
+		for (PluginDescriptor tmp : allMatchingRemote) {
+			if (newest==null || isNewer(tmp, newest))
+				newest = tmp;
+		}
+		return newest;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * For each installed plugin, try to find a matching remote available one
+	 */
+	private static List<PluginDescriptor> detectUpdates(List<PluginDescriptor> localList, List<PluginDescriptor> remoteList) {
+		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>();
+		for (PluginDescriptor local : localList) {
+			List<PluginDescriptor> allMatchingRemote = null;
+			// If possible, find remote plugins by UUID
+			if (local.uuid!=null)
+				allMatchingRemote = findByUUID(local.uuid, remoteList);
+			// If not found by UUID, try package name
+			if (allMatchingRemote==null || allMatchingRemote.isEmpty())
+				allMatchingRemote = findByName(local.name, remoteList);
+			// From all possible remote plugins, find the newest
+			PluginDescriptor newest = findNewest(allMatchingRemote);
+			// Is the newest remote - if it exists - newer than the local one?
+			// If so, mark it as update
+			if (newest!=null && isNewer(newest, local)) {
+				logger.debug("Update "+local+" with "+newest);
+				newest.localToUpdate = local;
+				ret.add(newest);
+			} else {
+				logger.debug("No update found for "+local);
+			}
+		}
+		
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
 	public static void updatePlugins() {
+		// Get list of plugins that are available locally
+		List<PluginDescriptor> installed = getLocallyAvailablePlugins();
+		logger.info("Found "+installed.size()+" installed plugins");
+
+		// Get list of plugins that could be downloaded
 		List<URL> updateURLs = getUpdateURLs("development");
 		List<PluginDescriptor> available = getAvailablePlugins(updateURLs);
 		logger.info("Found "+available.size()+" downloadable plugins");
 		
-		List<PluginDescriptor> installed = getLocallyAvailablePlugins();
-		logger.info("Found "+installed.size()+" installed plugins");
+		// Find those plugins that need updating
+		List<PluginDescriptor> updates = detectUpdates(installed, available);
 		
-		// TODO: Update plugins
-		downloadPlugins(available);
+		// Update plugins, if there are newer ones
+		downloadPlugins(updates);
+		
+		// Reload lost of local plugins
+		installed = getLocallyAvailablePlugins();
 		
 		// Add local plugins to classpath
 		for (PluginDescriptor pluginDesc : installed) {
+			int loaded = 0;
 			try {
 				for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
-					logger.info("Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+					logger.info("  Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
 					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
+					loaded++;
 				}
 			} catch (Exception e) {
 				logger.error("Failed loading plugins from "+pluginDesc.localFile,e);
 			}
+			logger.info("Loaded "+loaded+" plugins from "+pluginDesc.localFile);
 		}
 	}
 

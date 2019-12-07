@@ -3,17 +3,28 @@ package de.rpgframework.character;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.UUID;
 
-import org.prelle.rpgframework.character.PluginRegistry.UpdateResult;
+import de.rpgframework.character.PluginRegistry.UpdateResult;
 
 public class PluginDescriptor {
+	// Uniquely identifies the plugin, even if the name changes
+	public UUID uuid;
+	// A human readable plugin name
+	public String name;
+	/* The author of the plugin */
+	public String vendor;
+	/* A version identifier in the format: Major.Minor.Patch */
+	public String version;
+	/* Date when the plugin was built */
+	public Instant timestamp;
+	/* Roleplaying system */
+	public String system;
+	
 	public URL location;
 	public String filename;
-	public String name;
-	public String vendor;
-	public String version;
-	public Instant timestamp;
 	public int fileSize;
+	// Is the plugin in development, actively supported or abandoned
 	public PluginState state;
 	public URL homepage;
 	public URL bugtracker;
@@ -22,4 +33,11 @@ public class PluginDescriptor {
 	}
 	public transient Path localFile; 
 	public transient UpdateResult result;
+	public transient PluginDescriptor localToUpdate;
+	
+	public String getName() { return name; }
+	public String getVendor() { return vendor; }
+	public String getVersion() { return version; }
+	public PluginState getState() { return state; }
+	
 }

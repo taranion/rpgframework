@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
 import de.rpgframework.ConfigOption.Type;
-import de.rpgframework.RPGFramework;
 import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.boot.BootStep;
