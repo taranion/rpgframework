@@ -47,7 +47,6 @@ public class LoadRulePluginsBootStep implements BootStep {
 
 		this.configRoot = configRoot.createContainer("rules");
 		cfgAskOnStartup = configRoot.createOption("askOnStartUp", Type.BOOLEAN, Boolean.TRUE);
-		PluginRegistry.init(configRoot);
 
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))

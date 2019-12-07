@@ -31,8 +31,8 @@ import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.character.CharacterProviderLoader;
 import de.rpgframework.character.PluginDescriptor;
 import de.rpgframework.character.PluginRegistry;
-import de.rpgframework.character.RulePlugin;
 import de.rpgframework.character.PluginRegistry.UpdateResult;
+import de.rpgframework.character.RulePlugin;
 
 /**
  * @author Stefan Prelle
@@ -438,6 +438,21 @@ public class PluginUpdater {
 				logger.debug("No update found for "+local);
 			}
 		}
+		
+		// Now find those plugins, the user requested to update, but that
+		// are not available yet
+		for (PluginDescriptor remote : remoteList) {
+			List<PluginDescriptor> allMatchingLocal = null;
+			// If possible, find remote plugins by UUID
+			if (remote.uuid!=null)
+				allMatchingLocal = findByUUID(remote.uuid, localList);
+			// If not found
+			if ( (allMatchingLocal==null || allMatchingLocal.isEmpty())  && PluginRegistry.getPluginLoading(remote.uuid)) {
+				logger.info("Missing "+remote);
+				ret.add(remote);
+			}
+		}
+		
 		
 		return ret;
 	}

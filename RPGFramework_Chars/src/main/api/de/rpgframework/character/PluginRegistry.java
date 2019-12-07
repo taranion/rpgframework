@@ -54,11 +54,12 @@ public class PluginRegistry {
 
 	//-------------------------------------------------------------------
 	public static void init(ConfigContainer configRoot) {
-		cfgLoadUUIDs = configRoot.createOption("loadPlugins", Type.TEXT, "");
+		cfgLoadUUIDs = configRoot.createOption("uuidsToLoad", Type.TEXT, "");
 		StringTokenizer tok = new StringTokenizer(cfgLoadUUIDs.getValue());
 		while (tok.hasMoreTokens()) {
 			loadUUIDs.add(tok.nextToken().toLowerCase());
 		}
+		logger.info("init(): plugins are "+cfgLoadUUIDs.getValue());
 	}
 
 	//-------------------------------------------------------------------
@@ -149,7 +150,7 @@ public class PluginRegistry {
 	//-------------------------------------------------------------------
 	public static void register(UUID uuid, PluginDescriptor descr) {
 		if (uuid==null) throw new NullPointerException("UUID may not be null");
-		if (knownPlugins.containsKey(uuid)) throw new IllegalStateException("Already registered a plugin with that UUID");
+//		if (knownPlugins.containsKey(uuid)) throw new IllegalStateException("Already registered a plugin with that UUID");
 		knownPlugins.put(uuid, descr);
 	}
 

@@ -114,13 +114,19 @@ public class ConfigOptionImpl<T> extends ConfigNodeImpl implements ConfigOption<
 			return (T) val;
 		case TEXT:
 		case PASSWORD:
+			T valChoice = (T) PREF.get(getLocalId(), null);
+			if (valChoice==null)
+				valChoice = defaultValue;
+			return valChoice;
 		case CHOICE:
-			T valChoice = null;
+			valChoice = null;
 			String strChoice = PREF.get(getLocalId(), null);
 			if (strChoice!=null && converter!=null)
 				valChoice = converter.fromString(strChoice);
-			if (valChoice==null && converter==null)
+			if (valChoice==null && converter==null) {
+				logger.warn("No converter for CHOICE string of "+getPathID()+" found");
 				System.err.println("No converter for CHOICE string of "+getPathID()+" found");
+			}
 			if (valChoice==null)
 				valChoice = defaultValue;
 			return valChoice;

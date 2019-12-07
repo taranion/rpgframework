@@ -11,6 +11,7 @@ import de.rpgframework.RPGFrameworkLoader.FunctionType;
 import de.rpgframework.RPGFrameworkPlugin;
 import de.rpgframework.boot.StandardBootSteps;
 import de.rpgframework.character.CharacterProviderLoader;
+import de.rpgframework.character.PluginRegistry;
 
 /**
  * @author prelle
@@ -30,6 +31,7 @@ public class PluginRoleplayingSystems implements RPGFrameworkPlugin {
 		logger.debug("START: initialize");
 		try {
 			// Update plugins
+			PluginRegistry.init(framework.getConfiguration().createContainer("rules"));
 			PluginUpdater.updatePlugins();
 			// Load plugins
 			logger.debug("Set charprov");

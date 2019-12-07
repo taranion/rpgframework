@@ -142,7 +142,17 @@ public class ConfigContainerImpl extends ConfigNodeImpl implements ConfigContain
 				return child;
 			}
 		}
-		throw new NoSuchElementException();
+		throw new NoSuchElementException(id);
+	}
+
+	//-------------------------------------------------------------------
+	public boolean hasChild(String id) {
+		for (ConfigNode child : children) {
+			if (((ConfigNodeImpl)child).getLocalId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	//-------------------------------------------------------------------
@@ -249,6 +259,9 @@ public class ConfigContainerImpl extends ConfigNodeImpl implements ConfigContain
 	 */
 	@Override
 	public ConfigContainer createContainer(String id) {
+		if (hasChild(id) && getChild(id) instanceof ConfigContainer)
+			return (ConfigContainer) getChild(id);
+		
 		Preferences childPref = PREF.node(id);
 		ConfigContainerImpl ret = new ConfigContainerImpl(childPref, id);
 		ret.setParent(this);
