@@ -19,6 +19,7 @@ import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.boot.BootStep;
 import de.rpgframework.character.CharacterProviderLoader;
+import de.rpgframework.character.PluginRegistry;
 import de.rpgframework.character.RulePlugin;
 import de.rpgframework.character.RulePluginFeatures;
 import de.rpgframework.core.RoleplayingSystem;
@@ -46,6 +47,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 
 		this.configRoot = configRoot.createContainer("rules");
 		cfgAskOnStartup = configRoot.createOption("askOnStartUp", Type.BOOLEAN, Boolean.TRUE);
+		PluginRegistry.init(configRoot);
 
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))

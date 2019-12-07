@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -25,6 +26,10 @@ import java.util.zip.ZipInputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import de.rpgframework.ConfigContainer;
+import de.rpgframework.ConfigOption;
+import de.rpgframework.ConfigOption.Type;
 
 /**
  * @author spr
@@ -40,22 +45,20 @@ public class PluginRegistry {
 
 	private final static Logger logger = LogManager.getLogger("rpgframework");
 
-	private static Path pluginDir;
-	private static List<URL> updateServer;
 	private static Proxy proxy;
 
 	private static Map<UUID, PluginDescriptor> knownPlugins = new HashMap<UUID,PluginDescriptor>();
+	
+	private static ConfigOption<String> cfgLoadUUIDs;
+	private static List<String> loadUUIDs = new ArrayList<String>();
 
 	//-------------------------------------------------------------------
-	public static void init(Path directory) {
-		pluginDir = directory;
-		logger.info("Expecting plugins in "+directory);
-		logger.info("Download plugins from "+updateServer);
-	}
-
-	//-------------------------------------------------------------------
-	public static Path getBaseDirectory() {
-		return pluginDir;
+	public static void init(ConfigContainer configRoot) {
+		cfgLoadUUIDs = configRoot.createOption("loadPlugins", Type.TEXT, "");
+		StringTokenizer tok = new StringTokenizer(cfgLoadUUIDs.getValue());
+		while (tok.hasMoreTokens()) {
+			loadUUIDs.add(tok.nextToken().toLowerCase());
+		}
 	}
 
 	//-------------------------------------------------------------------
@@ -176,7 +179,26 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
+	private static void updateLoadUUIDConfig() {
+		cfgLoadUUIDs.set(String.join(" ", loadUUIDs));
+	}
+
+	//-------------------------------------------------------------------
 	public static void setPluginLoading(UUID uuid, boolean state) {
 		logger.info("Set loading state of "+uuid+" to "+state);
+		if (state && !loadUUIDs.contains(uuid.toString().toLowerCase())) {
+			loadUUIDs.add(uuid.toString().toLowerCase());
+			updateLoadUUIDConfig();
+		}
+		else if (!state && loadUUIDs.contains(uuid.toString().toLowerCase())) {
+			loadUUIDs.remove(uuid.toString().toLowerCase());
+			updateLoadUUIDConfig();
+		}
 	}
+
+	//-------------------------------------------------------------------
+	public static boolean getPluginLoading(UUID uuid) {
+		return loadUUIDs.contains(uuid.toString().toLowerCase());
+	}
+	
 }
