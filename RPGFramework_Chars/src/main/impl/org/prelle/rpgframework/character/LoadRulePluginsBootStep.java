@@ -19,7 +19,6 @@ import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.boot.BootStep;
 import de.rpgframework.character.CharacterProviderLoader;
-import de.rpgframework.character.PluginRegistry;
 import de.rpgframework.character.RulePlugin;
 import de.rpgframework.character.RulePluginFeatures;
 import de.rpgframework.core.RoleplayingSystem;

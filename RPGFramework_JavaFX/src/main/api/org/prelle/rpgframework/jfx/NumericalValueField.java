@@ -1,6 +1,5 @@
 package org.prelle.rpgframework.jfx;
 
-import de.rpgframework.StringConverter;
 import de.rpgframework.genericrpg.NumericalValue;
 import de.rpgframework.genericrpg.NumericalValueController;
 import javafx.geometry.Pos;

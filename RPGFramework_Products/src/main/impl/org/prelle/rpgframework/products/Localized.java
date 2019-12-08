@@ -3,7 +3,6 @@
  */
 package org.prelle.rpgframework.products;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import org.prelle.simplepersist.Attribute;

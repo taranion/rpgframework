@@ -11,7 +11,6 @@ import org.prelle.simplepersist.AttribConvert;
 import org.prelle.simplepersist.Attribute;
 import org.prelle.simplepersist.Root;
 
-import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.products.Adventure;
 import de.rpgframework.products.AdventureStory;

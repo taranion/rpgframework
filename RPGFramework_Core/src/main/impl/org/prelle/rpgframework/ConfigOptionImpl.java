@@ -106,6 +106,7 @@ public class ConfigOptionImpl<T> extends ConfigNodeImpl implements ConfigOption<
 	 * @see de.rpgframework.ConfigOption#getValue()
 	 */
 	@Override
+	@SuppressWarnings({ "unchecked" })
 	public T getValue() {
 		Preferences PREF = parent.getPreferences();
 		switch (type) {

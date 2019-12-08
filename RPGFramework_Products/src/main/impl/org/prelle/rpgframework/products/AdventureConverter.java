@@ -8,7 +8,6 @@ import org.prelle.simplepersist.XMLElementConverter;
 import org.prelle.simplepersist.marshaller.XmlNode;
 import org.prelle.simplepersist.unmarshal.XMLTreeItem;
 
-import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.products.Adventure;
 import de.rpgframework.products.ProductServiceLoader;

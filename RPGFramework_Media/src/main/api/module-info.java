@@ -11,7 +11,7 @@ module de.rpgframework.media {
 	requires java.sql;
 	requires java.xml;
 	requires org.apache.logging.log4j;
-	requires de.rpgframework.core;
-	requires de.rpgframework.products;
+	requires transitive de.rpgframework.core;
+	requires transitive de.rpgframework.products;
 	
 }
