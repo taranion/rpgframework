@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ExitCodes;
 import de.rpgframework.RPGFrameworkConstants;
+import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.character.CharacterProviderLoader;
 import de.rpgframework.character.PluginDescriptor;
 import de.rpgframework.character.PluginRegistry;
@@ -467,6 +468,11 @@ public class PluginUpdater {
 		List<URL> updateURLs = getUpdateURLs("development");
 		List<PluginDescriptor> available = getAvailablePlugins(updateURLs);
 		logger.info("Found "+available.size()+" downloadable plugins");
+		
+		// If no plugins have been configured, ask user to choose plugins
+//		if (PluginRegistry.getNumberOfPluginsToLoad()<4) {
+//			RPGFrameworkLoader.getCallback().showConfigOptions(id, configuration);
+//		}
 		
 		// Find those plugins that need updating
 		List<PluginDescriptor> updates = detectUpdates(installed, available);

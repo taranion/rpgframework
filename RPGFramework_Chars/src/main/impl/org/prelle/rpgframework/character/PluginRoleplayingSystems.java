@@ -38,6 +38,8 @@ public class PluginRoleplayingSystems implements RPGFrameworkPlugin {
 			CharacterProviderLoader.setCharacterProvider(new BaseCharacterProviderLight(framework.getConfiguration()));
 			
 			// Add steps
+			ConfigureUpdaterBootStep updater = new ConfigureUpdaterBootStep(framework.getConfiguration());
+			RPGFrameworkLoader.getInstance().addStepDefinition(StandardBootSteps.CONFIGURE_UPDATER, updater);
 			LoadRulePluginsBootStep rulePlugins = new LoadRulePluginsBootStep(framework.getConfiguration());
 			RPGFrameworkLoader.getInstance().addStepDefinition(StandardBootSteps.ROLEPLAYING_SYSTEMS, rulePlugins);
 		} catch (IOException e) {

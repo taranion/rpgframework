@@ -201,5 +201,10 @@ public class PluginRegistry {
 	public static boolean getPluginLoading(UUID uuid) {
 		return loadUUIDs.contains(uuid.toString().toLowerCase());
 	}
+
+	//-------------------------------------------------------------------
+	public static int getNumberOfPluginsToLoad() {
+		return loadUUIDs.size();
+	}
 	
 }

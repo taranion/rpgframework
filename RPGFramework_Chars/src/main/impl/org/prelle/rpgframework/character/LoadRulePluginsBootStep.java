@@ -46,56 +46,6 @@ public class LoadRulePluginsBootStep implements BootStep {
 
 		this.configRoot = configRoot.createContainer("rules");
 		cfgAskOnStartup = configRoot.createOption("askOnStartUp", Type.BOOLEAN, Boolean.TRUE);
-
-		String searchLang = Locale.getDefault().getLanguage();
-		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
-			searchLang = "en";
-		logger.info("Search plugins for language: "+searchLang);
-
-		for (RulePlugin<?> plugin : CharacterProviderLoader.getRulePlugins()) {
-			try {
-				if (plugin.getLanguages().contains(searchLang))
-					rulePlugins.add(plugin);
-				else
-					logger.warn("Ignore plugin "+plugin.getClass()+" because language "+searchLang+" not supported (only "+plugin.getLanguages()+")");
-			} catch (Throwable e) {
-				logger.fatal("Error instantiating plugin "+plugin,e);
-				e.printStackTrace();
-			}
-		}
-		/*
-		 * Now sort plugins. First by roleplaying system, than by features
-		 */
-		logger.debug("Sort plugins");
-		try {
-			Collections.sort(rulePlugins, new Comparator<RulePlugin<?>>() {
-				public int compare(RulePlugin<?> o1, RulePlugin<?> o2) {
-					if (o1.getRules()!=o2.getRules()) {
-						return Integer.compare(o1.getRules().ordinal(), o2.getRules().ordinal());
-					}
-					if (o1.getSupportedFeatures().contains(RulePluginFeatures.PERSISTENCE)) return -1;
-					return ((Integer)o1.getRequiredPlugins().size()).compareTo(o2.getRequiredPlugins().size());
-				}
-			});
-		} catch (Throwable e) {
-			logger.fatal("Cannot sort plugins: "+e);
-			e.printStackTrace();
-		}
-
-		/*
-		 * Detect all possible RoleplayingSystems
-		 */
-		List<RoleplayingSystem> rules = new ArrayList<RoleplayingSystem>();
-		ConfigContainer perSystem = this.configRoot.createContainer("perSystem");
-		for (RulePlugin<?> tmp : rulePlugins) {
-			if (!rules.contains(tmp.getRules())) {
-				rules.add(tmp.getRules());
-				ConfigOption<Boolean> cfgRule = perSystem.createOption(tmp.getRules().name(), Type.BOOLEAN, true);
-				cfgRule.setName(tmp.getRules().getName());
-				cfgPerRule.put(tmp.getRules(), cfgRule);
-			}
-		}
-		logger.debug("Available roleplaying systems: "+rules);
 	}
 
 	//-------------------------------------------------------------------
@@ -169,6 +119,56 @@ public class LoadRulePluginsBootStep implements BootStep {
 			callback.progressChanged(0);
 			callback.message("Initialize rule plugins");
 		}
+
+		String searchLang = Locale.getDefault().getLanguage();
+		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
+			searchLang = "en";
+		logger.info("Search plugins for language: "+searchLang);
+
+		for (RulePlugin<?> plugin : CharacterProviderLoader.getRulePlugins()) {
+			try {
+				if (plugin.getLanguages().contains(searchLang))
+					rulePlugins.add(plugin);
+				else
+					logger.warn("Ignore plugin "+plugin.getClass()+" because language "+searchLang+" not supported (only "+plugin.getLanguages()+")");
+			} catch (Throwable e) {
+				logger.fatal("Error instantiating plugin "+plugin,e);
+				e.printStackTrace();
+			}
+		}
+		/*
+		 * Now sort plugins. First by roleplaying system, than by features
+		 */
+		logger.debug("Sort plugins");
+		try {
+			Collections.sort(rulePlugins, new Comparator<RulePlugin<?>>() {
+				public int compare(RulePlugin<?> o1, RulePlugin<?> o2) {
+					if (o1.getRules()!=o2.getRules()) {
+						return Integer.compare(o1.getRules().ordinal(), o2.getRules().ordinal());
+					}
+					if (o1.getSupportedFeatures().contains(RulePluginFeatures.PERSISTENCE)) return -1;
+					return ((Integer)o1.getRequiredPlugins().size()).compareTo(o2.getRequiredPlugins().size());
+				}
+			});
+		} catch (Throwable e) {
+			logger.fatal("Cannot sort plugins: "+e);
+			e.printStackTrace();
+		}
+
+		/*
+		 * Detect all possible RoleplayingSystems
+		 */
+		List<RoleplayingSystem> rules = new ArrayList<RoleplayingSystem>();
+		ConfigContainer perSystem = this.configRoot.createContainer("perSystem");
+		for (RulePlugin<?> tmp : rulePlugins) {
+			if (!rules.contains(tmp.getRules())) {
+				rules.add(tmp.getRules());
+				ConfigOption<Boolean> cfgRule = perSystem.createOption(tmp.getRules().name(), Type.BOOLEAN, true);
+				cfgRule.setName(tmp.getRules().getName());
+				cfgPerRule.put(tmp.getRules(), cfgRule);
+			}
+		}
+		logger.debug("Available roleplaying systems: "+rules);
 
 //		Iterator<RulePlugin> it = ServiceLoader.load(RulePlugin.class, RPGFramework.class.getClassLoader()).iterator();
 		Iterator<RulePlugin<?>> it = rulePlugins.iterator();

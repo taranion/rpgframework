@@ -222,7 +222,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 			if (step.shallBeDisplayedToUser()) {
 				logger.info("  a) Display options to user from "+step.getClass());
 				if (callback!=null)
-				callback.showConfigOptions(step.getID(), step.getConfiguration());
+					callback.showConfigOptions(step.getID(), step.getConfiguration());
 				logger.debug("  b) Decisions");
 				for (ConfigOption<?> opt : step.getConfiguration()) {
 					logger.debug("   * "+opt.getLocalId()+" = "+opt.getValue());
