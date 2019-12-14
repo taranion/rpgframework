@@ -1,8 +1,10 @@
 package de.rpgframework.character;
 
 public enum PluginState {
+	DEVELOPMENT,
 	ALPHA,
 	BETA,
-	ACTIVE,
+	STABLE,
 	ABANDONED,
+	;
 }

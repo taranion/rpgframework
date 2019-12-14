@@ -86,40 +86,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 	 */
 	@Override
 	public List<ConfigOption<?>> getConfiguration() {
-		List<ConfigOption<?>> ret = new ArrayList<ConfigOption<?>>();
-		ret.addAll(cfgPerRule.values());
-		Collections.sort(ret, new Comparator<ConfigOption<?>>() {
-			public int compare(ConfigOption<?> o1, ConfigOption<?> o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
-		ret.add(cfgAskOnStartup);
-		return ret;
-	}
-
-	//--------------------------------------------------------------------
-	private boolean isPluginLoaded(List<RulePlugin<?>> alreadyLoaded, RoleplayingSystem rules, String search) {
-		// Find all loaded plugins with the required
-		for (RulePlugin<?> loaded : alreadyLoaded) {
-			if (loaded.getRules()==rules && loaded.getID().equals(search))
-				return true;
-		}
-		return false;
-	}
-
-	//-------------------------------------------------------------------
-	/**
-	 * @see de.rpgframework.boot.BootStep#execute()
-	 */
-	@Override
-	@SuppressWarnings("rawtypes")
-	public boolean execute(RPGFrameworkInitCallback callback) {
-		logger.debug("START----------Load rule plugins------------------------");
-		if (callback!=null) {
-			callback.progressChanged(0);
-			callback.message("Initialize rule plugins");
-		}
-
+		logger.info("******getConfiguration()*************");
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
 			searchLang = "en";
@@ -169,6 +136,41 @@ public class LoadRulePluginsBootStep implements BootStep {
 			}
 		}
 		logger.debug("Available roleplaying systems: "+rules);
+
+		List<ConfigOption<?>> ret = new ArrayList<ConfigOption<?>>();
+		ret.addAll(cfgPerRule.values());
+		Collections.sort(ret, new Comparator<ConfigOption<?>>() {
+			public int compare(ConfigOption<?> o1, ConfigOption<?> o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		ret.add(cfgAskOnStartup);
+		return ret;
+	}
+
+	//--------------------------------------------------------------------
+	private boolean isPluginLoaded(List<RulePlugin<?>> alreadyLoaded, RoleplayingSystem rules, String search) {
+		// Find all loaded plugins with the required
+		for (RulePlugin<?> loaded : alreadyLoaded) {
+			if (loaded.getRules()==rules && loaded.getID().equals(search))
+				return true;
+		}
+		return false;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.boot.BootStep#execute()
+	 */
+	@Override
+	@SuppressWarnings("rawtypes")
+	public boolean execute(RPGFrameworkInitCallback callback) {
+		logger.info("START----------Load rule plugins------------------------");
+		if (callback!=null) {
+			callback.progressChanged(0);
+			callback.message("Initialize rule plugins");
+		}
+
 
 //		Iterator<RulePlugin> it = ServiceLoader.load(RulePlugin.class, RPGFramework.class.getClassLoader()).iterator();
 		Iterator<RulePlugin<?>> it = rulePlugins.iterator();
