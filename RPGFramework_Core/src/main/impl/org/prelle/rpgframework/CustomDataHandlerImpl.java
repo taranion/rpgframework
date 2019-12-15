@@ -3,6 +3,7 @@
  */
 package org.prelle.rpgframework;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PropertyResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,6 +61,14 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		List<String> ret = new ArrayList<>();
 		// Find directory specific to roleplaying system
 		Path rpgDir = localBaseDir.resolve(rules.name().toLowerCase());
+		if (!Files.exists(rpgDir)) {
+			try {
+				Files.createDirectory(rpgDir);
+			} catch (IOException e) {
+				logger.error("Could not create custom data directory "+rpgDir,e);
+				return ret;
+			}
+		}
 		try {
 			DirectoryStream<Path> dir = Files.newDirectoryStream(rpgDir, "*.xml");
 			dir.forEach(filepath -> {
@@ -75,7 +85,25 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 	@Override
 	public CustomDataPackage getCustomData(RoleplayingSystem rules, String identifier) {
 		// Find directory specific to roleplaying system
-		return null;
+		Path rpgDir = localBaseDir.resolve(rules.name().toLowerCase());
+		
+		CustomDataPackage ret = new CustomDataPackage();
+		
+		// Data file
+		ret.datafile = rpgDir.resolve(identifier+".xml");
+		// Regular properties
+		try {
+			ret.properties = new PropertyResourceBundle(Files.newInputStream(rpgDir.resolve(identifier+".properties")));
+			// Help properties
+			Path helpPath = rpgDir.resolve(identifier+"-help.properties");
+			if (helpPath!=null)
+				ret.helpProperties = new PropertyResourceBundle(Files.newInputStream(helpPath));
+		} catch (IOException e) {
+			logger.error("Failed obtaining custom data for "+rules+"/"+identifier,e);
+			return null;
+		}
+		
+		return ret;
 	}
 
 }
