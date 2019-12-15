@@ -134,14 +134,14 @@ public class PluginRegistry {
 				case "Implementation-Vendor" : ret.vendor  = val; break;
 				case "Implementation-Version": ret.version = val; break;
 				case "UUID"      : ret.uuid       = UUID.fromString(val); break;
-				case "State"     : ret.state      = PluginState.valueOf(val); break;
 				case "Url"       : ret.homepage   = new URL(val); break;
 				case "Bugtracker": ret.bugtracker = new URL(val); break;
 				case "Build-Time": ret.timestamp  = Instant.parse(val); break;
 				case "Package"   : ret.system     = val; break;
+				case "State"     : ret.state      = PluginState.valueOf(val); break;
 				}
 			} catch (Exception e) {
-				logger.error("Failed parsing manifest header:\n"+entry.getKey()+" = "+entry.getValue(),e);
+				logger.error("Failed parsing manifest header of '"+ret.name+"': "+entry.getKey()+" = "+entry.getValue());
 			}
 		}
 		return ret;

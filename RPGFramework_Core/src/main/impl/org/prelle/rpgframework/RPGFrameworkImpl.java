@@ -22,6 +22,7 @@ import de.rpgframework.StringConverter;
 import de.rpgframework.boot.BootStep;
 import de.rpgframework.boot.LoadFrameworkPluginsBootStep;
 import de.rpgframework.boot.StandardBootSteps;
+import de.rpgframework.core.CustomDataHandlerLoader;
 import de.rpgframework.core.LicenseManager;
 
 /**
@@ -37,9 +38,9 @@ public class RPGFrameworkImpl implements RPGFramework {
 	private ConfigOption<String> cfgDataDir;
 	private ConfigContainer cfgPlugins;
 
-//	private FunctionCharacterAndRules charAndRules;
-//	private FunctionSessionManagement sessionManagement;
-//	private FunctionMediaLibraries    mediaLibraries;
+	//	private FunctionCharacterAndRules charAndRules;
+	//	private FunctionSessionManagement sessionManagement;
+	//	private FunctionMediaLibraries    mediaLibraries;
 	private LicenseManager license;
 
 	private Map<StandardBootSteps, BootStep> stepDefinitions;
@@ -101,14 +102,14 @@ public class RPGFrameworkImpl implements RPGFramework {
 		});
 		cfgDataDir  = configRoot.createOption(PROP_DATADIR , ConfigOption.Type.DIRECTORY,
 				System.getProperty("user.home")+System.getProperty("file.separator")+"rpgframework");
-//		cfgRuleLimit= configRoot.createOption(PROP_RULE_LIMIT , ConfigOption.Type.MULTI_CHOICE, null);
-//		cfgRuleLimit.setOptions(RoleplayingSystem.SPLITTERMOND, RoleplayingSystem.SHADOWRUN, RoleplayingSystem.SPACE1889);
-//		cfgRuleLimit.setValueConverter(new StringConverter<RoleplayingSystem>() {
-//			public String toString(RoleplayingSystem val) { return val.getName();}
-//			public RoleplayingSystem fromString(String val) { return RoleplayingSystem.valueOf(val); }
-//		});
-//		configRoot.createOption(PROP_UPDATE_ASK , ConfigOption.Type.BOOLEAN, Boolean.TRUE);
-//		configRoot.createOption(PROP_UPDATE_RUN , ConfigOption.Type.BOOLEAN, Boolean.TRUE);
+		//		cfgRuleLimit= configRoot.createOption(PROP_RULE_LIMIT , ConfigOption.Type.MULTI_CHOICE, null);
+		//		cfgRuleLimit.setOptions(RoleplayingSystem.SPLITTERMOND, RoleplayingSystem.SHADOWRUN, RoleplayingSystem.SPACE1889);
+		//		cfgRuleLimit.setValueConverter(new StringConverter<RoleplayingSystem>() {
+		//			public String toString(RoleplayingSystem val) { return val.getName();}
+		//			public RoleplayingSystem fromString(String val) { return RoleplayingSystem.valueOf(val); }
+		//		});
+		//		configRoot.createOption(PROP_UPDATE_ASK , ConfigOption.Type.BOOLEAN, Boolean.TRUE);
+		//		configRoot.createOption(PROP_UPDATE_RUN , ConfigOption.Type.BOOLEAN, Boolean.TRUE);
 		cfgPlugins  = configRoot.createContainer("plugins");
 	}
 
@@ -163,107 +164,112 @@ public class RPGFrameworkImpl implements RPGFramework {
 	public void initialize(RPGFrameworkInitCallback callback) {
 		logger.info("START: initialize");
 		try {
-		if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().message("Initialize framework");
-//		if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().progressChanged(0.75);
-//		addStepDefinition(StandardBootSteps.FRAMEWORK_PLUGINS, new LoadFrameworkPluginsBootStep(this));
 
-		/*
-		 * 1. Load all framework plugins
-		 */
-		logger.info("1. Load framework plugins");
-		(new LoadFrameworkPluginsBootStep(this)).execute(callback);
-		
-		/*
-		 * Translate Bootstep definitions to Bootstep implementations
-		 */
-		logger.info("2. Translate Bootstep definitions to Bootstep implementation");
-		List<BootStep> bootSteps = new ArrayList<BootStep>();
-		for (StandardBootSteps stepDef : requestedSteps) {
-			BootStep step = stepDefinitions.get(stepDef);
-			if (step==null) {
-				logger.fatal("  Don't support "+stepDef);
-			} else {
-				logger.debug("  Use "+step+" as "+stepDef);
-				bootSteps.add(step);
-			}
-		}
-		/*
-		 * Add custom boot steps
-		 */
-		bootSteps.addAll(customSteps);
+			// Configure CustomDataHandler
+			CustomDataHandlerLoader.setInstance(new CustomDataHandlerImpl(configRoot));
 
-		/*
-		 * Calculate total weight
-		 */
-		logger.info("3. Calculate total weight");
-		double totalWeight = 0;
-		for (BootStep step : bootSteps) {
-			logger.info("+"+step.getWeight()+" for step "+step);
-			totalWeight += step.getWeight();
-		}
-		logger.debug("Total weight of steps is "+totalWeight);
+			if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().message("Initialize framework");
+			//		if (RPGFrameworkLoader.getCallback()!=null) RPGFrameworkLoader.getCallback().progressChanged(0.75);
+			//		addStepDefinition(StandardBootSteps.FRAMEWORK_PLUGINS, new LoadFrameworkPluginsBootStep(this));
 
-		/*
-		 * Execute plugins
-		 */
-		logger.debug("  Bootsteps = "+bootSteps);
-		int sum = 0;
-		for (BootStep step : bootSteps) {
-			percentStart = ((double)sum) / totalWeight;
-			if (callback!=null)
-			callback.progressChanged(percentStart);
-			logger.info(String.format("At %2f %% call %s", percentStart, step.getClass()));
-			double percentPerPlugin = ((double)step.getWeight())/totalWeight;
-
-			try {
 			/*
-			 * Check if BootStep shall be presented to user
+			 * 1. Load all framework plugins
 			 */
-			if (step.shallBeDisplayedToUser()) {
-				logger.info("  a) Display options to user from "+step.getClass());
+			logger.info("1. Load framework plugins");
+			(new LoadFrameworkPluginsBootStep(this)).execute(callback);
+
+			/*
+			 * Translate Bootstep definitions to Bootstep implementations
+			 */
+			logger.info("2. Translate Bootstep definitions to Bootstep implementation");
+			List<BootStep> bootSteps = new ArrayList<BootStep>();
+			for (StandardBootSteps stepDef : requestedSteps) {
+				BootStep step = stepDefinitions.get(stepDef);
+				if (step==null) {
+					logger.fatal("  Don't support "+stepDef);
+				} else {
+					logger.debug("  Use "+step+" as "+stepDef);
+					bootSteps.add(step);
+				}
+			}
+			/*
+			 * Add custom boot steps
+			 */
+			bootSteps.addAll(customSteps);
+
+			/*
+			 * Calculate total weight
+			 */
+			logger.info("3. Calculate total weight");
+			double totalWeight = 0;
+			for (BootStep step : bootSteps) {
+				logger.info("+"+step.getWeight()+" for step "+step);
+				totalWeight += step.getWeight();
+			}
+			logger.debug("Total weight of steps is "+totalWeight);
+
+			/*
+			 * Execute plugins
+			 */
+			logger.debug("  Bootsteps = "+bootSteps);
+			int sum = 0;
+			for (BootStep step : bootSteps) {
+				percentStart = ((double)sum) / totalWeight;
 				if (callback!=null)
-					callback.showConfigOptions(step.getID(), step.getConfiguration());
-				logger.debug("  b) Decisions");
-				for (ConfigOption<?> opt : step.getConfiguration()) {
-					logger.debug("   * "+opt.getLocalId()+" = "+opt.getValue());
-				}
+					callback.progressChanged(percentStart);
+				logger.info(String.format("At %2f %% call %s", percentStart, step.getClass()));
+				double percentPerPlugin = ((double)step.getWeight())/totalWeight;
 
+				try {
+					/*
+					 * Check if BootStep shall be presented to user
+					 */
+					if (step.shallBeDisplayedToUser()) {
+						logger.info("  a) Display options to user from "+step.getClass());
+						if (callback!=null)
+							callback.showConfigOptions(step.getID(), step.getConfiguration());
+						logger.debug("  b) Decisions");
+						for (ConfigOption<?> opt : step.getConfiguration()) {
+							logger.debug("   * "+opt.getLocalId()+" = "+opt.getValue());
+						}
+
+					}
+
+					RPGFrameworkInitCallback listener = new RPGFrameworkInitCallback() {
+						public void progressChanged(double value) {
+							if (callback!=null)
+								callback.progressChanged(percentStart + percentPerPlugin*value);
+							else
+								logger.debug("Load progress: "+(percentStart + percentPerPlugin*value)*100);
+						}
+						public void message(String mess) {
+							if (callback!=null)
+								callback.message(mess);
+							else
+								logger.debug("Load message: "+mess);
+						}
+						public void errorOccurred(String location, String detail, Throwable exception) {
+							if (callback!=null)
+								callback.errorOccurred(location, detail, exception);
+							else
+								logger.debug("Load error: "+location+" / "+detail);
+						}
+						@Override
+						public void showConfigOptions(String id, List<ConfigOption<?>> configuration) {
+							logger.debug("showConfigOptions: "+id+" / "+configuration);
+						}
+					};
+					step.execute(listener);
+				} catch (Exception e) {
+					logger.error("Error in step "+step,e);
+				}
+				sum += step.getWeight();
+				percentStart = ((double)sum) / totalWeight;
+				logger.info(String.format("At %2f %% finished %s", percentStart, step.getClass()));
+				callback.progressChanged(1.0);
 			}
-
-			RPGFrameworkInitCallback listener = new RPGFrameworkInitCallback() {
-				public void progressChanged(double value) {
-					if (callback!=null)
-						callback.progressChanged(percentStart + percentPerPlugin*value);
-					else
-						logger.debug("Load progress: "+(percentStart + percentPerPlugin*value)*100);
-				}
-				public void message(String mess) {
-					if (callback!=null)
-						callback.message(mess);
-					else
-						logger.debug("Load message: "+mess);
-				}
-				public void errorOccurred(String location, String detail, Throwable exception) {
-					if (callback!=null)
-						callback.errorOccurred(location, detail, exception);
-					else
-						logger.debug("Load error: "+location+" / "+detail);
-				}
-				@Override
-				public void showConfigOptions(String id, List<ConfigOption<?>> configuration) {
-					logger.debug("showConfigOptions: "+id+" / "+configuration);
-				}
-			};
-			step.execute(listener);
-			} catch (Exception e) {
-				logger.error("Error in step "+step,e);
-			}
-			sum += step.getWeight();
-			percentStart = ((double)sum) / totalWeight;
-			logger.info(String.format("At %2f %% finished %s", percentStart, step.getClass()));
-			callback.progressChanged(1.0);
-		}
-
+		} catch (Exception e) {
+			logger.fatal("Error configuring RPGFramework",e);
 		} finally {
 			logger.info("STOP : initialize");
 		}
@@ -278,57 +284,57 @@ public class RPGFrameworkImpl implements RPGFramework {
 		return license;
 	}
 
-//	//-------------------------------------------------------------------
-//	/**
-//	 * @see de.rpgframework.RPGFramework#getCharacterAndRules()
-//	 */
-//	@Override
-//	public FunctionCharacterAndRules getCharacterAndRules() {
-//		return charAndRules;
-//	}
-//
-//	//-------------------------------------------------------------------
-//	public void setCharacterAndRules(FunctionCharacterAndRules value) {
-//		this.charAndRules = value;
-//	}
-//
-//	//-------------------------------------------------------------------
-//	/**
-//	 * @see de.rpgframework.RPGFramework#getMediaLibraries()
-//	 */
-//	@Override
-//	public FunctionMediaLibraries getMediaLibraries() {
-//		return mediaLibraries;
-//	}
-//
-//	//-------------------------------------------------------------------
-//	public void setMediaLibraries(FunctionMediaLibraries value) {
-//		this.mediaLibraries = value;
-//	}
-//
-//	//-------------------------------------------------------------------
-//	/**
-//	 * @see de.rpgframework.RPGFramework#getSessionManagement()
-//	 */
-//	@Override
-//	public FunctionSessionManagement getSessionManagement() {
-//		if (sessionManagement==null) {
-//			return new FunctionSessionManagement() {
-//				public Webserver getWebserver() {return null;}
-//				public SocialNetworkProvider getSocialNetworkProvider() {return null;}
-//				public SessionService getSessionService() {return null;}
-//				public SessionScreen getSessionScreen() {return null;}
-//				public PlayerService getPlayerService() {return null;}
-//				public DeviceService getDeviceService() {return null;}
-//				public CharacterProviderFull getCharacterService() {return null;}
-//			};
-//		}
-//		return sessionManagement;
-//	}
-//
-//	//-------------------------------------------------------------------
-//	public void setSessionManagement(FunctionSessionManagement value) {
-//		this.sessionManagement = value;
-//	}
+	//	//-------------------------------------------------------------------
+	//	/**
+	//	 * @see de.rpgframework.RPGFramework#getCharacterAndRules()
+	//	 */
+	//	@Override
+	//	public FunctionCharacterAndRules getCharacterAndRules() {
+	//		return charAndRules;
+	//	}
+	//
+	//	//-------------------------------------------------------------------
+	//	public void setCharacterAndRules(FunctionCharacterAndRules value) {
+	//		this.charAndRules = value;
+	//	}
+	//
+	//	//-------------------------------------------------------------------
+	//	/**
+	//	 * @see de.rpgframework.RPGFramework#getMediaLibraries()
+	//	 */
+	//	@Override
+	//	public FunctionMediaLibraries getMediaLibraries() {
+	//		return mediaLibraries;
+	//	}
+	//
+	//	//-------------------------------------------------------------------
+	//	public void setMediaLibraries(FunctionMediaLibraries value) {
+	//		this.mediaLibraries = value;
+	//	}
+	//
+	//	//-------------------------------------------------------------------
+	//	/**
+	//	 * @see de.rpgframework.RPGFramework#getSessionManagement()
+	//	 */
+	//	@Override
+	//	public FunctionSessionManagement getSessionManagement() {
+	//		if (sessionManagement==null) {
+	//			return new FunctionSessionManagement() {
+	//				public Webserver getWebserver() {return null;}
+	//				public SocialNetworkProvider getSocialNetworkProvider() {return null;}
+	//				public SessionService getSessionService() {return null;}
+	//				public SessionScreen getSessionScreen() {return null;}
+	//				public PlayerService getPlayerService() {return null;}
+	//				public DeviceService getDeviceService() {return null;}
+	//				public CharacterProviderFull getCharacterService() {return null;}
+	//			};
+	//		}
+	//		return sessionManagement;
+	//	}
+	//
+	//	//-------------------------------------------------------------------
+	//	public void setSessionManagement(FunctionSessionManagement value) {
+	//		this.sessionManagement = value;
+	//	}
 
 }
