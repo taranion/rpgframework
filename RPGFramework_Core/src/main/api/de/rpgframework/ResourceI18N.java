@@ -24,7 +24,7 @@ public class ResourceI18N {
 //			BasePluginData.reportKey(e, res);
 //			System.err.println("Missing key '"+key+"' in "+res.getBaseBundleName());
 			logger.error("Missing key '"+key+"' in "+res.getBaseBundleName());
-//			LogManager.getLogger("shadowrun6").error(" => "+e.getStackTrace()[3]);
+			logger.error(" => "+e.getStackTrace()[6]);
 		}
 		return key;
 	}

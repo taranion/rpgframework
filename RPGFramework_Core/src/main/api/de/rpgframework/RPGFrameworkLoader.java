@@ -8,12 +8,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author prelle
@@ -56,32 +53,6 @@ public class RPGFrameworkLoader {
 	//--------------------------------------------------------------------
 	static {
 		frameworkPlugins = new ArrayList<RPGFrameworkPlugin>();
-
-		Formatter format = new Formatter() {
-			public String format(LogRecord record) {
-				return String.format("%5s [%s] (%s) %s\r\n", record.getLevel().getName(), record.getLoggerName(),
-						record.getSourceClassName().substring(record.getSourceClassName().lastIndexOf(".")+1), record.getMessage());
-			}
-		};
-
-		logger.setUseParentHandlers(false);
-		logger.setLevel(Level.FINER);
-		ConsoleHandler console = new java.util.logging.ConsoleHandler();
-		console.setLevel(Level.WARNING);
-		console.setFormatter(format);
-		logger.addHandler(console);
-		try {
-			String logDir = System.getProperty("logdir");
-			if (logDir==null || logDir.isEmpty())
-				logDir = System.getProperty("user.home");
-			FileHandler    logfile = new FileHandler(logDir+System.getProperty("file.separator")+"rpgframework.log");
-			logfile.setLevel (Level.FINER);
-			logfile.setFormatter(format);
-			logger.addHandler(logfile);
-		} catch (Exception e) {
-			logger.warning("Failed creating bootstrap logfile. "+e);
-		}
-
 	}
 
 	//--------------------------------------------------------------------
@@ -108,7 +79,7 @@ public class RPGFrameworkLoader {
 		while (it.hasNext()) {
 			try {
 				instance = it.next();
-				logger.info("Found framework "+instance.getClass());
+				LogManager.getLogger("rpgframework").debug("Found framework "+instance.getClass());
 				return instance;
 			} catch (UnsupportedClassVersionError e) {
 				logger.severe("Error instantiating "+instance.getClass()+": "+e.getMessage());

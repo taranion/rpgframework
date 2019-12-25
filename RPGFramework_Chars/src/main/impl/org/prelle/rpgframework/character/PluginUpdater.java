@@ -63,27 +63,7 @@ public class PluginUpdater {
 			System.exit(ExitCodes.ERROR_INIT_PHASE);
 		}
 		
-			return Paths.get(System.getProperty(RPGFrameworkConstants.PROPERTY_INSTALLATION_DIRECTORY));
-//		CodeSource codeSource = PluginUpdater.class.getProtectionDomain().getCodeSource();
-//		URL codeSourceURL = codeSource.getLocation();
-//		if (codeSourceURL.getProtocol().equals("file")) {
-//			// Started from JAR
-//			try {
-//				Path ret = Paths.get(codeSourceURL.toURI()).getParent().getParent();
-//				return ret;
-//			} catch (URISyntaxException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		} else if (codeSourceURL.getProtocol().equals("jrt")) {
-//			// Started a)s runtime image
-//			Path ret = Paths.get(System.getProperty("java.home")).getParent().getParent();
-//			return ret;
-//		}
-//		
-//		System.err.println("Cannot detect installation directory");
-//		System.exit(ExitCodes.UNKNOWN_INSTALL_LOCATION);
-//		return null;
+		return Paths.get(System.getProperty(RPGFrameworkConstants.PROPERTY_INSTALLATION_DIRECTORY));
 	}
 	
 	//-------------------------------------------------------------------
