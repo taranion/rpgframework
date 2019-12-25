@@ -1,5 +1,6 @@
 package de.rpgframework.character;
 
+import java.lang.module.ModuleDescriptor.Version;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -20,6 +21,10 @@ public class PluginDescriptor {
 	public Instant timestamp;
 	/* Roleplaying system */
 	public String system;
+	/* Required minimum framework version */
+	public Version minVersion;
+	/* Required maximum framework version */
+	public Version maxVersion;
 	
 	public URL location;
 	public String filename;

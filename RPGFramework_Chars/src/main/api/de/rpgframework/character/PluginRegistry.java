@@ -3,6 +3,7 @@ package de.rpgframework.character;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.module.ModuleDescriptor.Version;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -139,6 +140,8 @@ public class PluginRegistry {
 				case "Build-Time": ret.timestamp  = Instant.parse(val); break;
 				case "Package"   : ret.system     = val; break;
 				case "State"     : ret.state      = PluginState.valueOf(val); break;
+				case "MinVersion": ret.minVersion = Version.parse(val); break;
+				case "MaxVersion": ret.maxVersion = Version.parse(val); break;
 				}
 			} catch (Exception e) {
 				logger.error("Failed parsing manifest header of '"+ret.name+"': "+entry.getKey()+" = "+entry.getValue());

@@ -3,6 +3,7 @@ package org.prelle.rpgframework.character;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.module.ModuleDescriptor.Version;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -48,7 +50,7 @@ public class PluginUpdater {
 
 	private static Path installDir;
 	private static Path pluginDir;
-	private static int[] frameworkVersion;
+	private static Version frameworkVersion;
 
 	//-------------------------------------------------------------------
 	static {
@@ -182,6 +184,17 @@ public class PluginUpdater {
 					descriptor.location = tmp.jar;
 					descriptor.fileSize = getFileSize(descriptor.location);
 					logger.debug("  Found "+descriptor);
+					
+					// Check version
+					if (descriptor.minVersion!=null && descriptor.minVersion.compareTo(frameworkVersion)>0) {
+						logger.info("  Ignore available plugin "+tmp.filename+" because required minimum version "+descriptor.minVersion+" not provided");
+						continue;
+					}
+					if (descriptor.maxVersion!=null && descriptor.maxVersion.compareTo(frameworkVersion)<0) {
+						logger.info("  Ignore available plugin "+tmp.filename+" because required maximum version "+descriptor.maxVersion+" not provided");
+						continue;
+					}
+					
 					ret.add(descriptor);
 					
 					if (descriptor.uuid!=null && PluginRegistry.getRegistered(descriptor.uuid)==null) {
@@ -238,6 +251,7 @@ public class PluginUpdater {
 					PluginDescriptor descr = PluginRegistry.getPluginInfo(url);
 					descr.fileSize = (int) jarPath.toFile().length();
 					descr.localFile= jarPath;
+					descr.filename = jarPath.getFileName().toString();
 					ret.add(descr);
 					if (descr.uuid!=null) {
 						PluginRegistry.register(descr.uuid, descr);
@@ -445,11 +459,40 @@ public class PluginUpdater {
 	 * Find out which version of RPGFramework has been provided
 	 */
 	private static void detectFrameworkVersion() {
-		Package pack = RPGFramework.class.getPackage();
-		logger.info("Framework1 = "+pack.getImplementationVersion());
-		logger.info("Framework2 = "+pack.getSpecificationVersion());
-		logger.info("Framework3 = "+pack.getImplementationVendor());
-		logger.info("Framework4 = "+pack.getSpecificationVendor());
+		Optional<Version> version = RPGFramework.class.getModule().getDescriptor().version();
+		if (version.isPresent()) {
+			frameworkVersion = version.get();
+		}
+		logger.info("Framework version is "+frameworkVersion);
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * Delete those plugins locally installed, that don't work
+	 * with the current Genesis version
+	 */
+	private static void deleteLocalInstalledUnusablePlugins(List<PluginDescriptor> installed) {
+		if (frameworkVersion!=null) {
+			for (PluginDescriptor descr : new ArrayList<>(installed)) {
+				if (descr.minVersion!=null && descr.minVersion.compareTo(frameworkVersion)>0) {
+					logger.warn("Plugin "+descr.filename+" requires minimum RPGFramework "+descr.minVersion+" but Genesis only provides "+frameworkVersion);
+					installed.remove(descr);
+					try {
+						Files.delete(descr.localFile);
+					} catch (IOException e) {
+						logger.error("Failed deleting outdated plugin "+descr.localFile+": "+e);
+					}
+				} else if (descr.maxVersion!=null && descr.maxVersion.compareTo(frameworkVersion)>0) {
+					logger.warn("Plugin "+descr+" requires maximum RPGFramework "+descr.maxVersion+" but Genesis only provides "+frameworkVersion);
+					installed.remove(descr);
+					try {
+						Files.delete(descr.localFile);
+					} catch (IOException e) {
+						logger.error("Failed deleting outdated plugin "+descr.localFile+": "+e);
+					}
+				}
+			}
+		}
 	}
 
 	//-------------------------------------------------------------------
@@ -458,9 +501,12 @@ public class PluginUpdater {
 		List<PluginDescriptor> installed = getLocallyAvailablePlugins();
 		logger.info("Found "+installed.size()+" installed plugins");
 		
+		// Find out the provided RPGFramework version
 		detectFrameworkVersion();
 		
-		// Find out the provided RPGFramework version
+		// Remove all local plugins, which's required framework version
+		// does not match provided one
+		deleteLocalInstalledUnusablePlugins(installed);
 
 		// Get list of plugins that could be downloaded
 		List<URL> updateURLs = getUpdateURLs("development");
@@ -478,7 +524,7 @@ public class PluginUpdater {
 		// Update plugins, if there are newer ones
 		downloadPlugins(updates);
 		
-		// Reload lost of local plugins
+		// Reload list of local plugins
 		installed = getLocallyAvailablePlugins();
 		
 		// Add local plugins to classpath
