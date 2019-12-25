@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ExitCodes;
+import de.rpgframework.RPGFramework;
 import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.character.CharacterProviderLoader;
@@ -47,6 +48,7 @@ public class PluginUpdater {
 
 	private static Path installDir;
 	private static Path pluginDir;
+	private static int[] frameworkVersion;
 
 	//-------------------------------------------------------------------
 	static {
@@ -439,10 +441,26 @@ public class PluginUpdater {
 	}
 
 	//-------------------------------------------------------------------
+	/**
+	 * Find out which version of RPGFramework has been provided
+	 */
+	private static void detectFrameworkVersion() {
+		Package pack = RPGFramework.class.getPackage();
+		logger.info("Framework1 = "+pack.getImplementationVersion());
+		logger.info("Framework2 = "+pack.getSpecificationVersion());
+		logger.info("Framework3 = "+pack.getImplementationVendor());
+		logger.info("Framework4 = "+pack.getSpecificationVendor());
+	}
+
+	//-------------------------------------------------------------------
 	public static void updatePlugins() {
 		// Get list of plugins that are available locally
 		List<PluginDescriptor> installed = getLocallyAvailablePlugins();
 		logger.info("Found "+installed.size()+" installed plugins");
+		
+		detectFrameworkVersion();
+		
+		// Find out the provided RPGFramework version
 
 		// Get list of plugins that could be downloaded
 		List<URL> updateURLs = getUpdateURLs("development");
