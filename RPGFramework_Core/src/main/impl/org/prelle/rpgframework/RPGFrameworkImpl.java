@@ -162,7 +162,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 	 */
 	@Override
 	public void initialize(RPGFrameworkInitCallback callback) {
-		logger.info("START: initialize");
+		logger.debug("START: initialize");
 		try {
 
 			// Configure CustomDataHandler
@@ -203,15 +203,15 @@ public class RPGFrameworkImpl implements RPGFramework {
 			logger.info("3. Calculate total weight");
 			double totalWeight = 0;
 			for (BootStep step : bootSteps) {
-				logger.info("+"+step.getWeight()+" for step "+step);
+				logger.debug("   +"+step.getWeight()+" for step "+step);
 				totalWeight += step.getWeight();
 			}
-			logger.debug("Total weight of steps is "+totalWeight);
+			logger.debug("   Total weight of steps is "+totalWeight);
 
 			/*
 			 * Execute plugins
 			 */
-			logger.debug("  Bootsteps = "+bootSteps);
+			logger.debug("4. Execute Bootsteps = "+bootSteps);
 			int sum = 0;
 			for (BootStep step : bootSteps) {
 				percentStart = ((double)sum) / totalWeight;
@@ -271,7 +271,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 		} catch (Exception e) {
 			logger.fatal("Error configuring RPGFramework",e);
 		} finally {
-			logger.info("STOP : initialize");
+			logger.debug("STOP : initialize");
 		}
 	}
 
