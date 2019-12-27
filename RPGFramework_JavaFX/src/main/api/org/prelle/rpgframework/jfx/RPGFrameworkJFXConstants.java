@@ -16,4 +16,6 @@ public interface RPGFrameworkJFXConstants {
 
 	public final static String BASE_LOGGER_NAME = "rpgframework.jfx";
 
+	public final static String STYLESHEET = RPGFrameworkJFXConstants.class.getResource("css/rpgframework.css").toExternalForm();
+	
 }
