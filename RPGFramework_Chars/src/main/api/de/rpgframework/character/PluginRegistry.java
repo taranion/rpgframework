@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
 import de.rpgframework.ConfigOption.Type;
+import de.rpgframework.products.ProductDataPlugin;
 
 /**
  * @author spr
@@ -105,6 +107,11 @@ public class PluginRegistry {
 				plugins.add(plugin);
 
 			});
+			Iterator<ProductDataPlugin> it = ServiceLoader.load(ProductDataPlugin.class).iterator();
+			while (it.hasNext()) {
+				ProductDataPlugin plugin = it.next();
+				logger.info("********Found prodzct data"+plugin);
+			}
 		} catch (Throwable e) {
 			logger.fatal("Failed loading plugin(s) from "+jarFile,e);
 		}
