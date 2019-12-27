@@ -1,4 +1,4 @@
-package org.prelle.rpgframework.character;
+package org.prelle.rpgframework.character.boot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +29,7 @@ import de.rpgframework.core.RoleplayingSystem;
  */
 public class LoadRulePluginsBootStep implements BootStep {
 
-	private final static Logger logger = LogManager.getLogger("babylon.chars");
+	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
 	private List<RulePlugin<?>> rulePlugins;
 	private List<RulePlugin<?>> acceptedRulePlugins;
@@ -86,7 +86,6 @@ public class LoadRulePluginsBootStep implements BootStep {
 	 */
 	@Override
 	public List<ConfigOption<?>> getConfiguration() {
-		logger.debug("******getConfiguration()*************");
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
 			searchLang = "en";

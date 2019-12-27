@@ -29,9 +29,5 @@
 			<groupId>de.rpgframework</groupId>
 			<artifactId>rpgframework-core</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>de.rpgframework</groupId>
-			<artifactId>rpgframework-products</artifactId>
-		</dependency>
 	</dependencies>
 </project>

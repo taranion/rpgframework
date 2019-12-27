@@ -1,4 +1,4 @@
-package de.rpgframework.character;
+package de.rpgframework;
 
 public enum PluginState {
 	DEVELOPMENT,

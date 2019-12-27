@@ -1,4 +1,4 @@
-package de.rpgframework.character;
+package org.prelle.rpgframework;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,31 +31,28 @@ import org.apache.logging.log4j.Logger;
 import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
 import de.rpgframework.ConfigOption.Type;
-import de.rpgframework.products.ProductDataPlugin;
+import de.rpgframework.PluginDescriptor;
+import de.rpgframework.PluginRegistry;
+import de.rpgframework.PluginState;
 
 /**
  * @author spr
  *
  */
-public class PluginRegistry {
+public class PluginRegistryImpl implements PluginRegistry {
 
-	public static enum UpdateResult {
-		UPDATED,
-		FAILED,
-		VERIFICATION_FAILED
-	}
+	private final Logger logger = LogManager.getLogger("rpgframework");
 
-	private final static Logger logger = LogManager.getLogger("rpgframework");
+	private Proxy proxy;
 
-	private static Proxy proxy;
-
-	private static Map<UUID, PluginDescriptor> knownPlugins = new HashMap<UUID,PluginDescriptor>();
+	private Map<UUID, PluginDescriptor> localPlugins = new HashMap<UUID,PluginDescriptor>();
+	private Map<UUID, List<PluginDescriptor>> remotePlugins = new HashMap<UUID, List<PluginDescriptor>>();
 	
-	private static ConfigOption<String> cfgLoadUUIDs;
-	private static List<String> loadUUIDs = new ArrayList<String>();
+	private ConfigOption<String> cfgLoadUUIDs;
+	private List<String> loadUUIDs = new ArrayList<String>();
 
 	//-------------------------------------------------------------------
-	public static void init(ConfigContainer configRoot) {
+	public void init(ConfigContainer configRoot) {
 		cfgLoadUUIDs = configRoot.createOption("uuidsToLoad", Type.TEXT, "");
 		StringTokenizer tok = new StringTokenizer(cfgLoadUUIDs.getValue());
 		while (tok.hasMoreTokens()) {
@@ -66,7 +62,7 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
-	public static PluginDescriptor getPluginInfo(URL url) throws IOException {
+	public PluginDescriptor getPluginInfo(URL url) throws IOException {
 		PluginDescriptor ret = new PluginDescriptor();
 		ret.location = url;
 
@@ -94,33 +90,7 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
-	public static List<RulePlugin<?>> loadPlugin(Path jarFile) {
-		List<RulePlugin<?>> plugins = new ArrayList<>();
-		try {
-			ClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, PluginRegistry.class.getClassLoader());
-			logger.debug(" search for plugins in "+jarFile);
-			ServiceLoader.load(RulePlugin.class, loader).forEach(plugin -> {
-				Package pack = plugin.getClass().getPackage();
-				logger.debug("Found plugin "+plugin.getClass());
-				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
-
-				plugins.add(plugin);
-
-			});
-			Iterator<ProductDataPlugin> it = ServiceLoader.load(ProductDataPlugin.class).iterator();
-			while (it.hasNext()) {
-				ProductDataPlugin plugin = it.next();
-				logger.info("********Found prodzct data"+plugin);
-			}
-		} catch (Throwable e) {
-			logger.fatal("Failed loading plugin(s) from "+jarFile,e);
-		}
-
-		return plugins;
-	}
-
-	//-------------------------------------------------------------------
-	public static PluginDescriptor downloadAndParsePluginDescriptor(URL url) throws IOException {
+	public PluginDescriptor downloadAndParsePluginDescriptor(URL url) throws IOException {
 		logger.trace("load plugin manifest "+url+"  and proxy "+proxy);
 		URLConnection con = ((proxy!=null)?url.openConnection(proxy):url.openConnection());
 		logger.trace("  last modified = "+con.getLastModified());
@@ -128,7 +98,7 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
-	public static PluginDescriptor parsePluginDescriptor(InputStream in) throws IOException {
+	public PluginDescriptor parsePluginDescriptor(InputStream in) throws IOException {
 		PluginDescriptor ret = new PluginDescriptor();
 
 		Manifest manifest = new Manifest(in);
@@ -140,7 +110,7 @@ public class PluginRegistry {
 				switch (key) {
 				case "Implementation-Title"  : ret.name    = val; break;
 				case "Implementation-Vendor" : ret.vendor  = val; break;
-				case "Implementation-Version": ret.version = val; break;
+				case "Implementation-Version": ret.version = Version.parse(val); break;
 				case "UUID"      : ret.uuid       = UUID.fromString(val); break;
 				case "Url"       : ret.homepage   = new URL(val); break;
 				case "Bugtracker": ret.bugtracker = new URL(val); break;
@@ -151,28 +121,39 @@ public class PluginRegistry {
 				case "MaxVersion": ret.maxVersion = Version.parse(val); break;
 				}
 			} catch (Exception e) {
-				logger.error("Failed parsing manifest header of '"+ret.name+"': "+entry.getKey()+" = "+entry.getValue());
+				logger.warn("Failed parsing manifest header of '"+ret.name+"': "+entry.getKey()+" = "+entry.getValue());
 			}
 		}
 		return ret;
 	}
 
 	//-------------------------------------------------------------------
-	public static void register(UUID uuid, PluginDescriptor descr) {
+	public void registerLocal(UUID uuid, PluginDescriptor descr) {
 		if (uuid==null) throw new NullPointerException("UUID may not be null");
-//		if (knownPlugins.containsKey(uuid)) throw new IllegalStateException("Already registered a plugin with that UUID");
-		knownPlugins.put(uuid, descr);
+		localPlugins.put(uuid, descr);
 	}
 
 	//-------------------------------------------------------------------
-	public static PluginDescriptor getRegistered(UUID uuid) {
+	public void registerRemote(UUID uuid, PluginDescriptor descr) {
 		if (uuid==null) throw new NullPointerException("UUID may not be null");
-		return knownPlugins.get(uuid);
+		List<PluginDescriptor> list = remotePlugins.get(uuid);
+		if (list==null) {
+			list = new ArrayList<PluginDescriptor>();
+			remotePlugins.put(uuid, list);
+		}
+		list.add(descr);
 	}
 
 	//-------------------------------------------------------------------
-	public static List<PluginDescriptor> getKnownPlugins() {
-		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>(knownPlugins.values());
+	public List<PluginDescriptor> getRegisteredRemote(UUID uuid) {
+		if (uuid==null) throw new NullPointerException("UUID may not be null");
+		return remotePlugins.get(uuid);
+	}
+
+	//-------------------------------------------------------------------
+	@Override
+	public List<PluginDescriptor> getKnownPlugins() {
+		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>(localPlugins.values());
 		Collections.sort(ret, new Comparator<PluginDescriptor>() {
 
 			@Override
@@ -190,12 +171,33 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
-	private static void updateLoadUUIDConfig() {
+	public List<PluginDescriptor> getKnownRemotePlugins() {
+		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>();
+		remotePlugins.values().forEach(list -> ret.addAll(list));
+		Collections.sort(ret, new Comparator<PluginDescriptor>() {
+
+			@Override
+			public int compare(PluginDescriptor o1, PluginDescriptor o2) {
+				int cmp = 0;
+				if (o1.system!=null) {					
+					cmp = o1.system.compareTo(o2.system);
+				}
+				if (cmp!=0)
+					return cmp;
+				return o1.name.compareTo(o2.name);
+			}
+		});
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
+	private void updateLoadUUIDConfig() {
 		cfgLoadUUIDs.set(String.join(" ", loadUUIDs));
 	}
 
 	//-------------------------------------------------------------------
-	public static void setPluginLoading(UUID uuid, boolean state) {
+	@Override
+	public void setPluginLoading(UUID uuid, boolean state) {
 		if (state && !loadUUIDs.contains(uuid.toString().toLowerCase())) {
 			logger.info("Set loading state of "+uuid+" to "+state);
 			loadUUIDs.add(uuid.toString().toLowerCase());
@@ -209,13 +211,25 @@ public class PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
-	public static boolean getPluginLoading(UUID uuid) {
+	@Override
+	public boolean getPluginLoading(UUID uuid) {
 		return loadUUIDs.contains(uuid.toString().toLowerCase());
 	}
 
 	//-------------------------------------------------------------------
-	public static int getNumberOfPluginsToLoad() {
+	public int getNumberOfPluginsToLoad() {
 		return loadUUIDs.size();
+	}
+
+	//-------------------------------------------------------------------
+	public void unregisterRemote(PluginDescriptor descriptor) {
+		List<PluginDescriptor> list = remotePlugins.get(descriptor.uuid);
+		if (list==null) 
+			return;
+		list.remove(descriptor);
+		
+		if (list.isEmpty())
+			remotePlugins.remove(descriptor.uuid);
 	}
 	
 }

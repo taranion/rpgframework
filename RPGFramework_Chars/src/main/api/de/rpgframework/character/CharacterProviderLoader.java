@@ -9,8 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.LogManager;
+import org.prelle.rpgframework.character.BabylonConstants;
 
+import de.rpgframework.PluginDescriptor;
 import de.rpgframework.core.RoleplayingSystem;
 
 /**
@@ -31,7 +32,6 @@ public class CharacterProviderLoader {
 	//--------------------------------------------------------------------
 	public static void setCharacterProvider(CharacterProvider service) {
 		charProv = service;
-		LogManager.getLogger("babylon.chars").debug("*********************************************Set CharacterProvider "+service);
 	}
 
 	//--------------------------------------------------------------------
@@ -43,10 +43,7 @@ public class CharacterProviderLoader {
 		}
 		list.add(plugin);
 		
-//		if (rulePlugins.containsKey(plugin.getRules()))
-//			throw new IllegalStateException("Already registered a plugin for "+plugin.getRules()+": "+rulePlugins.get(plugin.getRules()));
-		LogManager.getLogger("babylon.chars").warn("##################Register plugin "+plugin.getClass()+" = "+plugin.getReadableName()+" for rules "+plugin.getRules());
-//		rulePlugins.put(plugin.getRules(), plugin);
+		BabylonConstants.logger.debug("Register plugin "+plugin.getClass()+" = "+plugin.getReadableName()+" for rules "+plugin.getRules());
 		descriptors.put(plugin, descriptor);
 	}
 

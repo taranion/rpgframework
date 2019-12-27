@@ -44,4 +44,7 @@ public interface RPGFramework {
 
 	public LicenseManager getLicenseManager();
 
+	//-------------------------------------------------------------------
+	public PluginRegistry getPluginRegistry();
+
 }

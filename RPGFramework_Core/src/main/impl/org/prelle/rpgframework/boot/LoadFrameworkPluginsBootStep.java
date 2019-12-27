@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.rpgframework.boot;
+package org.prelle.rpgframework.boot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +18,7 @@ import de.rpgframework.ConfigOption;
 import de.rpgframework.RPGFramework;
 import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.RPGFrameworkPlugin;
+import de.rpgframework.boot.BootStep;
 
 /**
  * @author Stefan

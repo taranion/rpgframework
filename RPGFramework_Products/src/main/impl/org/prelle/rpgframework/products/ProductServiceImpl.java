@@ -41,7 +41,7 @@ import de.rpgframework.products.ProductService;
  */
 public class ProductServiceImpl implements ProductService {
 
-	private final static Logger logger = LogManager.getLogger("babylon.products");
+	private final static Logger logger = LogManager.getLogger("rpgframework.products");
 
 	private final static String DIRNAME_PLUGINS = "data";
 	private final static String DIRNAME_CUSTOM  = "productData";

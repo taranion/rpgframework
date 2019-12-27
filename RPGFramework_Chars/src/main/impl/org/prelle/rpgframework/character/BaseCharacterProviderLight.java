@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.prelle.simplepersist.Persister;
 import org.prelle.simplepersist.Serializer;
@@ -43,7 +42,7 @@ import de.rpgframework.core.RoleplayingSystem;
  */
 public class BaseCharacterProviderLight implements CharacterProvider {
 	
-	protected Logger logger = LogManager.getLogger("babylon.chars");
+	protected Logger logger = BabylonConstants.logger;
 	
 	private final static String INDEX = "index.xml";
 

@@ -1,16 +1,17 @@
-package org.prelle.rpgframework.character;
+package org.prelle.rpgframework.boot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.prelle.rpgframework.PluginUpdater;
 
 import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
+import de.rpgframework.PluginRegistry;
 import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.boot.BootStep;
-import de.rpgframework.character.PluginRegistry;
 
 /**
  * @author Stefan
@@ -39,7 +40,7 @@ public class ConfigureUpdaterBootStep implements BootStep {
 	 */
 	@Override
 	public int getWeight() {
-		return 50;
+		return 10;
 	}
 
 	//-------------------------------------------------------------------
@@ -73,7 +74,7 @@ public class ConfigureUpdaterBootStep implements BootStep {
 			callback.message("Configure plugin updater");
 		}
 		
-		PluginUpdater.updatePlugins();
+//		PluginUpdater.updatePlugins();
 		logger.debug("STOP ----------Configured updater------------------------");
 		// TODO Auto-generated method stub
 		callback.progressChanged(1.0);

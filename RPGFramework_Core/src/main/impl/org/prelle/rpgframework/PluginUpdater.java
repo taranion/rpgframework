@@ -1,4 +1,4 @@
-package org.prelle.rpgframework.character;
+package org.prelle.rpgframework;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,14 +29,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ExitCodes;
+import de.rpgframework.PluginDescriptor;
+import de.rpgframework.PluginRegistry;
 import de.rpgframework.RPGFramework;
 import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.RPGFrameworkLoader;
-import de.rpgframework.character.CharacterProviderLoader;
-import de.rpgframework.character.PluginDescriptor;
-import de.rpgframework.character.PluginRegistry;
-import de.rpgframework.character.PluginRegistry.UpdateResult;
-import de.rpgframework.character.RulePlugin;
+import de.rpgframework.UpdateResult;
 
 /**
  * @author Stefan Prelle
@@ -358,47 +356,48 @@ public class PluginUpdater {
 
 	//-------------------------------------------------------------------
 	private static boolean isNewer(PluginDescriptor check, PluginDescriptor reference) {
-		// Convert version to verify
-		int[] checkNum = new int[3];
-		if (check.version!=null) {
-			StringTokenizer tok = new StringTokenizer(check.version, ".-_");
-			int i=0;
-			while (tok.hasMoreTokens() && i<2) {
-				try {
-					checkNum[i] = Integer.parseInt(tok.nextToken());
-				} catch (NumberFormatException e) {
-					logger.warn("Invalid version of plugin "+check+": "+e);
-				}
-				i++;
-			}
-		}
-		// Convert version to reference
-		int[] refNum = new int[3];
-		if (reference.version!=null) {
-			StringTokenizer tok = new StringTokenizer(reference.version, ".-_");
-			int i=0;
-			while (tok.hasMoreTokens() && i<2) {
-				try {
-					refNum[i] = Integer.parseInt(tok.nextToken());
-				} catch (NumberFormatException e) {
-					logger.warn("Invalid version of plugin "+check+": "+e);
-				}
-				i++;
-			}
-		}
-		
-		logger.debug("Compare "+Arrays.toString(checkNum)+" with "+Arrays.toString(refNum));
-		// Now verify position for position
-		for (int i=0; i<refNum.length; i++) {
-			if (checkNum[i]>refNum[i])
-				return true;
-			if (checkNum[i]<refNum[1])
-				return false;
-		}
-		// Identical versions - compare file dates
-		if (check.timestamp.isAfter(reference.timestamp))
-			return true;
-		return false;
+		return check.getVersion().compareTo(reference.getVersion())>0;
+//		// Convert version to verify
+//		int[] checkNum = new int[3];
+//		if (check.version!=null) {
+//			StringTokenizer tok = new StringTokenizer(check.version, ".-_");
+//			int i=0;
+//			while (tok.hasMoreTokens() && i<2) {
+//				try {
+//					checkNum[i] = Integer.parseInt(tok.nextToken());
+//				} catch (NumberFormatException e) {
+//					logger.warn("Invalid version of plugin "+check+": "+e);
+//				}
+//				i++;
+//			}
+//		}
+//		// Convert version to reference
+//		int[] refNum = new int[3];
+//		if (reference.version!=null) {
+//			StringTokenizer tok = new StringTokenizer(reference.version, ".-_");
+//			int i=0;
+//			while (tok.hasMoreTokens() && i<2) {
+//				try {
+//					refNum[i] = Integer.parseInt(tok.nextToken());
+//				} catch (NumberFormatException e) {
+//					logger.warn("Invalid version of plugin "+check+": "+e);
+//				}
+//				i++;
+//			}
+//		}
+//		
+//		logger.debug("Compare "+Arrays.toString(checkNum)+" with "+Arrays.toString(refNum));
+//		// Now verify position for position
+//		for (int i=0; i<refNum.length; i++) {
+//			if (checkNum[i]>refNum[i])
+//				return true;
+//			if (checkNum[i]<refNum[1])
+//				return false;
+//		}
+//		// Identical versions - compare file dates
+//		if (check.timestamp.isAfter(reference.timestamp))
+//			return true;
+//		return false;
 	}
 
 	//-------------------------------------------------------------------
@@ -440,13 +439,14 @@ public class PluginUpdater {
 		
 		// Now find those plugins, the user requested to update, but that
 		// are not available yet
+		PluginRegistry registry = RPGFrameworkLoader.getInstance().getPluginRegistry();
 		for (PluginDescriptor remote : remoteList) {
 			List<PluginDescriptor> allMatchingLocal = null;
 			// If possible, find remote plugins by UUID
 			if (remote.uuid!=null)
 				allMatchingLocal = findByUUID(remote.uuid, localList);
 			// If not found
-			if ( (allMatchingLocal==null || allMatchingLocal.isEmpty())  && PluginRegistry.getPluginLoading(remote.uuid)) {
+			if ( (allMatchingLocal==null || allMatchingLocal.isEmpty())  && registry.getPluginLoading(remote.uuid)) {
 				logger.info("Missing "+remote);
 				ret.add(remote);
 			}
@@ -525,26 +525,6 @@ public class PluginUpdater {
 		
 		// Update plugins, if there are newer ones
 		downloadPlugins(updates);
-		
-		// Reload list of local plugins
-		logger.info("Reload list of installed plugins");
-		CharacterProviderLoader.clearRulePlugins();
-		installed = getLocallyAvailablePlugins();
-		
-		// Add local plugins to classpath
-		for (PluginDescriptor pluginDesc : installed) {
-			int loaded = 0;
-			try {
-				for (RulePlugin<?> plugin : PluginRegistry.loadPlugin(pluginDesc.localFile)) {
-					logger.info("  Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
-					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
-					loaded++;
-				}
-			} catch (Exception e) {
-				logger.error("Failed loading plugins from "+pluginDesc.localFile,e);
-			}
-			logger.info("Loaded "+loaded+" plugins from "+pluginDesc.localFile);
-		}
 	}
 
 }
