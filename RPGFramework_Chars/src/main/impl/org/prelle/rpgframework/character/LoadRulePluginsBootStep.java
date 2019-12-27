@@ -86,7 +86,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 	 */
 	@Override
 	public List<ConfigOption<?>> getConfiguration() {
-		logger.info("******getConfiguration()*************");
+		logger.debug("******getConfiguration()*************");
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
 			searchLang = "en";
@@ -184,7 +184,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 				}
 				if (callback!=null)
 					callback.message("Load "+plugin.getClass());
-				logger.info("Found possible rule plugin "+plugin.getClass());
+				logger.info("Found possible rule plugin "+plugin.getClass()+"/"+plugin.hashCode()+"/"+plugin.getClass().hashCode());
 				acceptedRulePlugins.add(plugin);
 			} catch (Throwable e) {
 				logger.fatal("Error instantiating plugin",e);

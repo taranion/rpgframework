@@ -186,13 +186,15 @@ public class PluginUpdater {
 					logger.debug("  Found "+descriptor);
 					
 					// Check version
-					if (descriptor.minVersion!=null && descriptor.minVersion.compareTo(frameworkVersion)>0) {
-						logger.info("  Ignore available plugin "+tmp.filename+" because required minimum version "+descriptor.minVersion+" not provided");
-						continue;
-					}
-					if (descriptor.maxVersion!=null && descriptor.maxVersion.compareTo(frameworkVersion)<0) {
-						logger.info("  Ignore available plugin "+tmp.filename+" because required maximum version "+descriptor.maxVersion+" not provided");
-						continue;
+					if (frameworkVersion!=null) {
+						if (descriptor.minVersion!=null && descriptor.minVersion.compareTo(frameworkVersion)>0) {
+							logger.info("  Ignore available plugin "+tmp.filename+" because required minimum version "+descriptor.minVersion+" not provided");
+							continue;
+						}
+						if (descriptor.maxVersion!=null && descriptor.maxVersion.compareTo(frameworkVersion)<0) {
+							logger.info("  Ignore available plugin "+tmp.filename+" because required maximum version "+descriptor.maxVersion+" not provided");
+							continue;
+						}
 					}
 					
 					ret.add(descriptor);
@@ -525,6 +527,8 @@ public class PluginUpdater {
 		downloadPlugins(updates);
 		
 		// Reload list of local plugins
+		logger.info("Reload list of installed plugins");
+		CharacterProviderLoader.clearRulePlugins();
 		installed = getLocallyAvailablePlugins();
 		
 		// Add local plugins to classpath

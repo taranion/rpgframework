@@ -45,9 +45,14 @@ public class CharacterProviderLoader {
 		
 //		if (rulePlugins.containsKey(plugin.getRules()))
 //			throw new IllegalStateException("Already registered a plugin for "+plugin.getRules()+": "+rulePlugins.get(plugin.getRules()));
-		LogManager.getLogger("babylon.chars").debug("Register plugin "+plugin.getClass()+" = "+plugin.getReadableName());
+		LogManager.getLogger("babylon.chars").warn("##################Register plugin "+plugin.getClass()+" = "+plugin.getReadableName()+" for rules "+plugin.getRules());
 //		rulePlugins.put(plugin.getRules(), plugin);
 		descriptors.put(plugin, descriptor);
+	}
+
+	//--------------------------------------------------------------------
+	public static void clearRulePlugins() {
+		rulePlugins.clear();
 	}
 
 	//--------------------------------------------------------------------

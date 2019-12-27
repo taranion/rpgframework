@@ -189,12 +189,13 @@ public class PluginRegistry {
 
 	//-------------------------------------------------------------------
 	public static void setPluginLoading(UUID uuid, boolean state) {
-		logger.info("Set loading state of "+uuid+" to "+state);
 		if (state && !loadUUIDs.contains(uuid.toString().toLowerCase())) {
+			logger.info("Set loading state of "+uuid+" to "+state);
 			loadUUIDs.add(uuid.toString().toLowerCase());
 			updateLoadUUIDConfig();
 		}
 		else if (!state && loadUUIDs.contains(uuid.toString().toLowerCase())) {
+			logger.info("Set loading state of "+uuid+" to "+state);
 			loadUUIDs.remove(uuid.toString().toLowerCase());
 			updateLoadUUIDConfig();
 		}
