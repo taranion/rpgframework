@@ -1,0 +1,122 @@
+.flip-icon {
+	-fx-text-fill: white;
+	-fx-font-family: "Segoe UI Symbol";
+	-fx-padding: 8;
+	-fx-effect: dropshadow( one-pass-box , gray , 10 , 0.7 , 0 , 0 );
+}
+
+/* .card-tile { */
+/*   -fx-pref-width: 10em; */
+/*   -fx-min-height: 10em; */
+/*   -fx-background-color: green; */
+/* } */
+/* .card-tile .front { */
+/*   Labeled */
+/* } */
+/* .card-tile .back { */
+/*   VBox */
+/* } */
+
+/*
+ * CharacterViewScreen
+ */
+/* .character-view-screen .section-block { */
+/*   -fx-pref-width: 12em; */
+/*   -fx-background-color: red; */
+/* } */
+
+/* .drop-target { */
+/*   -fx-background-color: blue; */
+/*   -fx-scale-x: 0.8; */
+/*   -fx-scale-y: 0.8; */
+/* } */
+
+.character-document-view {
+  -fx-background-color: transparent;
+    -fx-padding: 0 1.8em 0 1.8em;
+}
+.character-document-view-scroll {
+  -fx-background-color: transparent;
+}
+.character-document-view-scroll > .viewport{
+  -fx-background-color: transparent;
+}
+.character-document-view-layout {
+  -fx-background-color: transparent;
+	-fx-spacing: 0.1em;
+}
+.character-document-view-grid {
+  -fx-vgap: 0em;
+  -fx-hgap: 2em;
+  -fx-padding: 0.5em;
+}
+.character-document-view-spacing {
+  -fx-pref-height: 1em;
+}
+.character-document-view-title {
+    -fx-background-color: lightgreen;
+}
+.character-document-view-todos {
+  -fx-min-width: 7em;
+  -fx-padding: 5em 0 0 0;
+}
+.character-document-view-todos .label {
+   -fx-background-color: rgba(255,255,255,0.5);
+}
+/* .character-document-view-content { */
+/*   -fx-background-color: -fx-base; */
+/*   -fx-border-width: 0px; */
+/*   -fx-border-style: solid; */
+/*   -fx-border-color: transparent; */
+/* } */
+.character-document-view-content {
+  -fx-background-color: transparent;
+}
+.character-document-view-section-content {
+  -fx-background-color: -fx-base-semitrans;
+  -fx-border-width: 1px;
+  -fx-border-style: solid;
+  -fx-border-color: transparent;
+}
+.character-document-view-description {
+  -fx-background-color: transparent;
+  -fx-padding: 0.2em;
+  -fx-max-width: 20em;
+  -fx-min-width: 10em;
+}
+
+.description-text {
+  -fx-padding: 0.2em;
+  -fx-max-width: 20em;
+  -fx-min-width: 10em;
+}
+
+.settings-and-commandbar {
+  -fx-border-color: black;
+  -fx-border-width: 0 0 1px 0;
+}
+
+.free-points {
+  -fx-background-color: rgba(255,255,255, 0.2);
+}
+.free-points .label{
+  -fx-text-fill: -fx-base;
+}
+.free-points:tospend {
+  -fx-background-color: green;
+}
+.free-points:invalid {
+  -fx-background-color: red;
+}
+.free-points .points {
+	-fx-padding: 0.5em 1em 0 1em;
+}
+.free-points .name {
+	-fx-padding: 0 1.5em 1em 1.5em;
+}
+
+.history-element {
+    -fx-background-color: transparent;
+	-fx-padding: 0.5em;
+    -fx-min-width: 25em;
+}
