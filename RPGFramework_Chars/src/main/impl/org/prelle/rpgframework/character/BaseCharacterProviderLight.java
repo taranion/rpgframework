@@ -318,7 +318,7 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 				attach = new Attachment(type, Format.RULESPECIFIC_EXTERNAL, filename);
 			}
 		}
-		logger.debug(" "+file+" is a "+type+" "+attach.getFormat());
+		logger.trace(" "+file+" is a "+type+" "+attach.getFormat());
 		
 		attach.setData(data);
 		attach.setLastModified(new Date(Files.getLastModifiedTime(file).toMillis()));

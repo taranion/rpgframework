@@ -1,28 +1,35 @@
-package org.prelle.rpgframework.boot;
+package org.prelle.rpgframework.character.boot;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.prelle.rpgframework.PluginUpdater;
 
-import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
+import de.rpgframework.PluginDescriptor;
 import de.rpgframework.PluginRegistry;
 import de.rpgframework.RPGFrameworkInitCallback;
+import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.boot.BootStep;
+import de.rpgframework.boot.StandardBootSteps;
+import de.rpgframework.character.CharacterProviderLoader;
+import de.rpgframework.character.RulePlugin;
 
 /**
  * @author Stefan
  *
  */
-public class ConfigureUpdaterBootStep implements BootStep {
+public class LoadCharactersStep implements BootStep {
 
-	private final static Logger logger = LogManager.getLogger("babylon.chars");
+	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
 	//-------------------------------------------------------------------
-	public ConfigureUpdaterBootStep(ConfigContainer configRoot2) {
+	public LoadCharactersStep() {
 	}
 
 	//-------------------------------------------------------------------
@@ -31,7 +38,7 @@ public class ConfigureUpdaterBootStep implements BootStep {
 	 */
 	@Override
 	public String getID() {
-		return "CONFIGURE_UPDATER";
+		return StandardBootSteps.CHARACTERS.name();
 	}
 
 	//-------------------------------------------------------------------
@@ -40,7 +47,7 @@ public class ConfigureUpdaterBootStep implements BootStep {
 	 */
 	@Override
 	public int getWeight() {
-		return 10;
+		return 20;
 	}
 
 	//-------------------------------------------------------------------
@@ -49,7 +56,7 @@ public class ConfigureUpdaterBootStep implements BootStep {
 	 */
 	@Override
 	public boolean shallBeDisplayedToUser() {
-		return true; //PluginRegistry.getNumberOfPluginsToLoad()<4;
+		return false;
 	}
 
 	//-------------------------------------------------------------------
@@ -68,15 +75,13 @@ public class ConfigureUpdaterBootStep implements BootStep {
 	 */
 	@Override
 	public boolean execute(RPGFrameworkInitCallback callback) {
-		logger.debug("START----------Configure updater------------------------");
 		if (callback!=null) {
 			callback.progressChanged(0);
-			callback.message("Configure plugin updater");
+			callback.message("Collect characters");
 		}
+
+		CharacterProviderLoader.getCharacterProvider().getMyCharacters();
 		
-//		PluginUpdater.updatePlugins();
-		logger.debug("STOP ----------Configured updater------------------------");
-		// TODO Auto-generated method stub
 		callback.progressChanged(1.0);
 		return true;
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.prelle.rpgframework.character.boot.LoadCharactersStep;
 import org.prelle.rpgframework.character.boot.LoadRulePluginsBootStep;
 import org.prelle.rpgframework.character.boot.RegisterRulePluginsStep;
 
@@ -40,6 +41,7 @@ public class PluginRoleplayingSystems implements RPGFrameworkPlugin {
 			// Add steps
 			LoadRulePluginsBootStep rulePlugins = new LoadRulePluginsBootStep(framework.getConfiguration());
 			RPGFrameworkLoader.getInstance().addStepDefinition(StandardBootSteps.ROLEPLAYING_SYSTEMS, rulePlugins);
+			RPGFrameworkLoader.getInstance().addStepDefinition(StandardBootSteps.CHARACTERS, new LoadCharactersStep());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.fatal("Failed initializing roleplaying systems",e);

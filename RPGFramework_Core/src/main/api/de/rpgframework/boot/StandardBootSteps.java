@@ -11,7 +11,7 @@ public enum StandardBootSteps {
 
 	FRAMEWORK_PLUGINS,
 	/** Ask user when plugin updater seems not configured yet */
-	CONFIGURE_UPDATER,
+	UPDATE_PLUGINS,
 	ROLEPLAYING_SYSTEMS,
 	PRODUCT_DATA,
 	CUSTOM_DATA,

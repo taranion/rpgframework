@@ -6,9 +6,7 @@ import java.io.InputStream;
 import java.lang.module.ModuleDescriptor.Version;
 import java.net.Proxy;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLConnection;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ServiceLoader;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.jar.Attributes;
@@ -171,6 +168,7 @@ public class PluginRegistryImpl implements PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
+	@Override
 	public List<PluginDescriptor> getKnownRemotePlugins() {
 		List<PluginDescriptor> ret = new ArrayList<PluginDescriptor>();
 		remotePlugins.values().forEach(list -> ret.addAll(list));
@@ -230,6 +228,18 @@ public class PluginRegistryImpl implements PluginRegistry {
 		
 		if (list.isEmpty())
 			remotePlugins.remove(descriptor.uuid);
+	}
+
+	//-------------------------------------------------------------------
+	public void updateLocalPlugin(PluginDescriptor descriptor) {
+		PluginDescriptor previous = localPlugins.get(descriptor.uuid);
+		if (previous==null) {
+			logger.info("Added new local plugin "+descriptor);
+			localPlugins.put(descriptor.uuid, descriptor);
+		} else {
+			logger.info("Updated local plugin "+descriptor);
+			localPlugins.put(descriptor.uuid, descriptor);
+		}
 	}
 	
 }

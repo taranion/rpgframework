@@ -21,10 +21,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.prelle.rpgframework.boot.CollectKnownLocalPluginsStep;
 import org.prelle.rpgframework.boot.CollectKnownRemotePluginsStep;
-import org.prelle.rpgframework.boot.ConfigureUpdaterBootStep;
 import org.prelle.rpgframework.boot.IgnoreNotMatchingRemotePlugins;
 import org.prelle.rpgframework.boot.KeepNewestRemotePluginStep;
-import org.prelle.rpgframework.boot.LoadFrameworkPluginsBootStep;
+import org.prelle.rpgframework.boot.UpdatePluginsStep;
 
 import de.rpgframework.ConfigContainer;
 import de.rpgframework.ConfigOption;
@@ -254,13 +253,13 @@ public class RPGFrameworkImpl implements RPGFramework {
 			bootSteps.add(new CollectKnownRemotePluginsStep(frameworkVersion, pluginRegistry));
 			bootSteps.add(new IgnoreNotMatchingRemotePlugins(frameworkVersion, pluginRegistry));
 			bootSteps.add(new KeepNewestRemotePluginStep(pluginRegistry));
-//			bootSteps.add(new LoadFrameworkPluginsBootStep(this));
+			bootSteps.add(new UpdatePluginsStep(pluginRegistry));
 			
 			/*
 			 * 2. Add optional boot steps that can be selected by the application
 			 */
 			logger.info("2. Add optional boot steps");
-			addStepDefinition(StandardBootSteps.CONFIGURE_UPDATER, new ConfigureUpdaterBootStep(getConfiguration()));
+//			addStepDefinition(StandardBootSteps.UPDATE_PLUGINS, new UpdatePluginsStep(pluginRegistry));
 			
 			/*
 			 * 3. Load all framework plugins
@@ -306,7 +305,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 			/*
 			 * Execute plugins
 			 */
-			logger.debug("4. Execute Bootsteps = "+bootSteps);
+			logger.debug("7. Execute configured Bootsteps = "+bootSteps);
 			int sum = 0;
 			for (BootStep step : bootSteps) {
 				percentStart = ((double)sum) / totalWeight;
