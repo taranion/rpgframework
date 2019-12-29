@@ -41,7 +41,7 @@
 		<log4j.version>2.11.1</log4j.version>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
-		<maven.skip.deploy>true</maven.skip.deploy>
+		<maven.skip.deploy>false</maven.skip.deploy>
 		<openjfx.version>14-ea+2</openjfx.version>
 		<revision>4.0.0-SNAPSHOT</revision>
 	</properties>
@@ -155,7 +155,7 @@
 	<distributionManagement>
 		<repository>
 			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
 <!-- 		<repository> -->
