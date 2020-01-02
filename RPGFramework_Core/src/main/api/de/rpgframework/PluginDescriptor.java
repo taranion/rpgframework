@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.UUID;
 
-public class PluginDescriptor {
+public class PluginDescriptor implements Comparable<PluginDescriptor> {
 	// Uniquely identifies the plugin, even if the name changes
 	public UUID uuid;
 	// A human readable plugin name
@@ -42,5 +42,17 @@ public class PluginDescriptor {
 	public String getVendor() { return vendor; }
 	public Version getVersion() { return version; }
 	public PluginState getState() { return state; }
+	
+	//-------------------------------------------------------------------
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(PluginDescriptor other) {
+		int cmp = system.compareTo(other.system);
+		if (cmp!=0)
+			return cmp;
+		return getName().compareTo(other.getName());
+	}
 	
 }

@@ -4,7 +4,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +20,7 @@ import de.rpgframework.RPGFrameworkLoader;
 import de.rpgframework.boot.BootStep;
 import de.rpgframework.character.CharacterProviderLoader;
 import de.rpgframework.character.RulePlugin;
+import de.rpgframework.core.RoleplayingSystem;
 
 /**
  * @author Stefan
@@ -27,8 +30,11 @@ public class RegisterRulePluginsStep implements BootStep {
 
 	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
+	private Map<RoleplayingSystem,URLClassLoader> knownCores;
+	
 	//-------------------------------------------------------------------
 	public RegisterRulePluginsStep() {
+		knownCores = new HashMap<RoleplayingSystem, URLClassLoader>();
 	}
 
 	//-------------------------------------------------------------------
@@ -69,10 +75,16 @@ public class RegisterRulePluginsStep implements BootStep {
 	}
 
 	//-------------------------------------------------------------------
-	public List<RulePlugin<?>> loadPlugin(Path jarFile) {
+	public List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
-			ClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, PluginRegistry.class.getClassLoader());
+			ClassLoader parent = PluginRegistry.class.getClassLoader();
+			if (rules!=null && knownCores.containsKey(rules)) {
+				parent = knownCores.get(rules);
+				System.err.println("Reuse core for "+rules);
+			}
+			
+			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
 			logger.debug(" search for plugins in "+jarFile);
 			ServiceLoader.load(RulePlugin.class, loader).forEach(plugin -> {
 				Package pack = plugin.getClass().getPackage();
@@ -80,6 +92,10 @@ public class RegisterRulePluginsStep implements BootStep {
 				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
 
 				plugins.add(plugin);
+				if (plugin.getID().equals("CORE")) {
+					knownCores.put(rules, loader);
+					System.err.println("Add core for "+rules);
+				}
 
 			});
 		} catch (Throwable e) {
@@ -109,7 +125,14 @@ public class RegisterRulePluginsStep implements BootStep {
 		for (PluginDescriptor pluginDesc : installed) {
 			int loaded = 0;
 			try {
-				for (RulePlugin<?> plugin : loadPlugin(pluginDesc.localFile)) {
+				RoleplayingSystem rules = null;
+				try {
+					rules = RoleplayingSystem.valueOf(pluginDesc.system);
+				} catch (Exception e) {
+					logger.error("Cannot detect rules of "+pluginDesc+": "+e);
+				}
+				
+				for (RulePlugin<?> plugin : loadPlugin(rules, pluginDesc.localFile)) {
 					logger.info("  Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
 					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
 					loaded++;
