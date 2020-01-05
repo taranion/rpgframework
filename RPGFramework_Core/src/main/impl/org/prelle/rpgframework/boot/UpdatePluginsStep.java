@@ -87,7 +87,7 @@ public class UpdatePluginsStep implements BootStep {
 	 */
 	@Override
 	public boolean shallBeDisplayedToUser() {
-		return true;
+		return RPGFrameworkLoader.getInstance().getPluginRegistry().getNumberOfPluginsToLoad()<1;
 	}
 
 	//-------------------------------------------------------------------

@@ -17,6 +17,8 @@ public interface PluginRegistry {
 	public void setPluginLoading(UUID uuid, boolean state);
 	
 	public boolean getPluginLoading(UUID uuid);
+	
+	public int getNumberOfPluginsToLoad();
 
 	public List<PluginDescriptor> getKnownRemotePlugins();
 	

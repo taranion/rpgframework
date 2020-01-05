@@ -185,6 +185,7 @@ public class PluginRegistryImpl implements PluginRegistry {
 				return o1.name.compareTo(o2.name);
 			}
 		});
+		System.err.println("getKnownRemotePlugins returns "+ret.size()+" of "+remotePlugins.size());
 		return ret;
 	}
 
@@ -194,6 +195,9 @@ public class PluginRegistryImpl implements PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.PluginRegistry#setPluginLoading(java.util.UUID, boolean)
+	 */
 	@Override
 	public void setPluginLoading(UUID uuid, boolean state) {
 		if (state && !loadUUIDs.contains(uuid.toString().toLowerCase())) {
@@ -209,12 +213,19 @@ public class PluginRegistryImpl implements PluginRegistry {
 	}
 
 	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.PluginRegistry#getPluginLoading(java.util.UUID)
+	 */
 	@Override
 	public boolean getPluginLoading(UUID uuid) {
 		return loadUUIDs.contains(uuid.toString().toLowerCase());
 	}
 
 	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.PluginRegistry#getNumberOfPluginsToLoad()
+	 */
+	@Override
 	public int getNumberOfPluginsToLoad() {
 		return loadUUIDs.size();
 	}

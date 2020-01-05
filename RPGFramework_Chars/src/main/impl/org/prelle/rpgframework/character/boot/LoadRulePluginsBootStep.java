@@ -256,7 +256,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 				try {
 					for (String search : plugin.getRequiredPlugins()) {
 						if (!isPluginLoaded(successful, plugin.getRules(), search)) {
-							logger.debug("Cannot load "+plugin.getRules()+"/"+plugin.getID()+" yet, because "+plugin.getRules()+"/"+search+" is missing");
+							logger.trace("Cannot load "+plugin.getRules()+"/"+plugin.getID()+" yet, because "+plugin.getRules()+"/"+search+" is missing");
 							continue outer;
 						}
 					}

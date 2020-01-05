@@ -81,7 +81,6 @@ public class RegisterRulePluginsStep implements BootStep {
 			ClassLoader parent = PluginRegistry.class.getClassLoader();
 			if (rules!=null && knownCores.containsKey(rules)) {
 				parent = knownCores.get(rules);
-				System.err.println("Reuse core for "+rules);
 			}
 			
 			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
@@ -94,7 +93,6 @@ public class RegisterRulePluginsStep implements BootStep {
 				plugins.add(plugin);
 				if (plugin.getID().equals("CORE")) {
 					knownCores.put(rules, loader);
-					System.err.println("Add core for "+rules);
 				}
 
 			});

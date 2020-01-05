@@ -111,7 +111,7 @@ public class IgnoreNotMatchingRemotePlugins implements BootStep {
 				registry.unregisterRemote(descriptor);
 				continue;
 			}
-			
+			logger.debug("  keep remote plugin "+descriptor);
 		}
 		
 		return true;
