@@ -115,9 +115,10 @@ public class CollectKnownRemotePluginsStep implements BootStep {
 	 */
 	@Override
 	public boolean execute(RPGFrameworkInitCallback callback) {
-
+		String profile = System.getProperty("profile", "development").toLowerCase();
+		
 		// Get list of plugins that could be downloaded
-		List<URL> updateURLs = getUpdateURLs("development");
+		List<URL> updateURLs = getUpdateURLs(profile);
 		List<PluginDescriptor> available = getAvailablePlugins(updateURLs);
 		logger.info("Found "+available.size()+" downloadable plugins");
 

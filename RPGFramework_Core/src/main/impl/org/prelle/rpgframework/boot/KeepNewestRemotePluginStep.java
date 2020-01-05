@@ -89,11 +89,11 @@ public class KeepNewestRemotePluginStep implements BootStep {
 				newest.put(key, descriptor);
 			else {
 				int cmp = soFar.version.compareTo(descriptor.getVersion()); 
-				if (cmp>0) {
+				if (cmp<0) {
 					// This one is newer
 					toDelete.add(soFar);
 					newest.put(key, descriptor);
-				} else if (cmp<0) {
+				} else if (cmp>0) {
 					toDelete.add(descriptor);
 				} else {
 					// Same version 
@@ -104,7 +104,7 @@ public class KeepNewestRemotePluginStep implements BootStep {
 		
 		// Remove older versions
 		for (PluginDescriptor deleteMe : toDelete) {
-			logger.warn("Unregister remote, because it is outdated");
+			logger.warn("Unregister remote, because it is outdated: "+deleteMe);
 			registry.unregisterRemote(deleteMe);
 		}
 		

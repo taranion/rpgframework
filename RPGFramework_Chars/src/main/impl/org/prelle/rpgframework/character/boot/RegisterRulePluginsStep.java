@@ -131,6 +131,9 @@ public class RegisterRulePluginsStep implements BootStep {
 				}
 				
 				for (RulePlugin<?> plugin : loadPlugin(rules, pluginDesc.localFile)) {
+					if (CharacterProviderLoader.knownsPlugin(plugin)) {
+						continue;
+					}
 					logger.info("  Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
 					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
 					loaded++;

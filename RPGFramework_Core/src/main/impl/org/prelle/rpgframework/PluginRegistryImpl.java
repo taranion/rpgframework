@@ -185,7 +185,6 @@ public class PluginRegistryImpl implements PluginRegistry {
 				return o1.name.compareTo(o2.name);
 			}
 		});
-		System.err.println("getKnownRemotePlugins returns "+ret.size()+" of "+remotePlugins.size());
 		return ret;
 	}
 

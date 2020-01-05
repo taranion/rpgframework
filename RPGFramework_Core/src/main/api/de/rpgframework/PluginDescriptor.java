@@ -42,6 +42,7 @@ public class PluginDescriptor implements Comparable<PluginDescriptor> {
 	public String getVendor() { return vendor; }
 	public Version getVersion() { return version; }
 	public PluginState getState() { return state; }
+	public Instant getTimestamp() { return timestamp; }
 	
 	//-------------------------------------------------------------------
 	/**

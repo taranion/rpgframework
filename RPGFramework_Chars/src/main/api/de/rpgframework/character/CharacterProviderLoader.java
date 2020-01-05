@@ -35,6 +35,19 @@ public class CharacterProviderLoader {
 	}
 
 	//--------------------------------------------------------------------
+	public static boolean knownsPlugin(RulePlugin<?> plugin) {
+		List<RulePlugin<?>> list = rulePlugins.get(plugin.getRules());
+		if (list==null)
+			return false;
+		
+		for (RulePlugin<?> tmp : list) {
+			if (tmp.getClass()==plugin.getClass())
+				return true;
+		}
+		return false;
+	}
+
+	//--------------------------------------------------------------------
 	public static void registerRulePlugin(RulePlugin<?> plugin, PluginDescriptor descriptor) {
 		List<RulePlugin<?>> list = rulePlugins.get(plugin.getRules());
 		if (list==null) {
