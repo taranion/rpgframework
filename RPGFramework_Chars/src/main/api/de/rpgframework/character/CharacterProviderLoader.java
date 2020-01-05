@@ -81,5 +81,18 @@ public class CharacterProviderLoader {
 	public static PluginDescriptor getPluginDescriptor(RulePlugin<?> plugin) {
 		return descriptors.get(plugin);
 	}
+
+	//--------------------------------------------------------------------
+	public static void unregisterRulePlugin(RulePlugin<?> plugin) {
+		List<RulePlugin<?>> list = rulePlugins.get(plugin.getRules());
+		if (list==null) {
+			return;
+		}
+		list.remove(plugin);
+		if (list.isEmpty())
+			rulePlugins.remove(plugin.getRules());
+		
+		BabylonConstants.logger.debug("Unregister plugin "+plugin.getClass()+" = "+plugin.getReadableName()+" for rules "+plugin.getRules());
+	}
 	
 }

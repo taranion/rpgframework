@@ -179,6 +179,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 				ConfigOption<Boolean> opt = cfgPerRule.get(plugin.getRules());
 				if (opt!=null && opt.getValue()==Boolean.FALSE) {
 					logger.warn("Ignore plugin "+plugin.getReadableName()+" / "+plugin.getClass().getSimpleName()+" by user configuration");
+					CharacterProviderLoader.unregisterRulePlugin(plugin);
 					continue;
 				}
 				if (callback!=null)
