@@ -164,7 +164,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public boolean execute(RPGFrameworkInitCallback callback) {
-		logger.info("START----------Load rule plugins------------------------");
+		logger.info("START----------Load "+rulePlugins.size()+" rule plugins------------------------");
 		if (callback!=null) {
 			callback.progressChanged(0);
 			callback.message("Initialize rule plugins");
@@ -309,7 +309,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 				}
 			}
 		}
-		logger.debug("STOP ----------Load rule plugins------------------------");
+		logger.info("STOP ----------Loaded rule plugins------------------------");
 		// TODO Auto-generated method stub
 		callback.progressChanged(1.0);
 		return true;
