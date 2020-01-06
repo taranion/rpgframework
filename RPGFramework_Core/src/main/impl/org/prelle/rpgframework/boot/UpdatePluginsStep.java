@@ -149,7 +149,11 @@ public class UpdatePluginsStep implements BootStep {
 					Files.deleteIfExists(backupFile);
 					if (desc.localToUpdate!=null) {
 						if (desc.localToUpdate.localFile!=null) {
-							Files.delete(desc.localToUpdate.localFile);
+							try {
+								Files.delete(desc.localToUpdate.localFile);
+							} catch (Exception e) {
+								logger.error("Delete failed for "+desc.localToUpdate.localFile,e);
+							}
 						}
 					}
 					// Backup previous file
