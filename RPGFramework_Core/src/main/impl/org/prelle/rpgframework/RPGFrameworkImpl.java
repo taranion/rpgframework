@@ -360,7 +360,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 				}
 				sum += step.getWeight();
 				percentStart = ((double)sum) / totalWeight;
-				logger.info(String.format("At %2f %% finished %s", percentStart, step.getClass()));
+//				logger.info(String.format("At %2f %% finished %s", percentStart, step.getClass()));
 				callback.progressChanged(1.0);
 			}
 		} catch (Exception e) {
