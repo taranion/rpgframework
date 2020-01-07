@@ -86,6 +86,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 	 */
 	@Override
 	public List<ConfigOption<?>> getConfiguration() {
+		rulePlugins.clear();
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
 			searchLang = "en";
