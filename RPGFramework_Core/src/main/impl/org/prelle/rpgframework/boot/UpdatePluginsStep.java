@@ -22,6 +22,7 @@ import de.rpgframework.ConfigOption;
 import de.rpgframework.ExitCodes;
 import de.rpgframework.PluginDescriptor;
 import de.rpgframework.PluginRegistry;
+import de.rpgframework.PluginState;
 import de.rpgframework.RPGFrameworkConstants;
 import de.rpgframework.RPGFrameworkInitCallback;
 import de.rpgframework.RPGFrameworkLoader;
@@ -43,6 +44,9 @@ public class UpdatePluginsStep implements BootStep {
 	private Path installDir;
 	private Path pluginDir;
 	private PluginRegistryImpl registry;
+	
+	private transient int count;
+	private transient int max;
 
 	//-------------------------------------------------------------------
 	public UpdatePluginsStep(PluginRegistryImpl registry) {
@@ -78,7 +82,7 @@ public class UpdatePluginsStep implements BootStep {
 	 */
 	@Override
 	public int getWeight() {
-		return 10;
+		return 30;
 	}
 
 	//-------------------------------------------------------------------
@@ -87,7 +91,8 @@ public class UpdatePluginsStep implements BootStep {
 	 */
 	@Override
 	public boolean shallBeDisplayedToUser() {
-		return RPGFrameworkLoader.getInstance().getPluginRegistry().getNumberOfPluginsToLoad()<1;
+		return false;
+//		return RPGFrameworkLoader.getInstance().getPluginRegistry().getNumberOfPluginsToLoad()<1;
 	}
 
 	//-------------------------------------------------------------------
@@ -105,20 +110,39 @@ public class UpdatePluginsStep implements BootStep {
 	 */
 	@Override
 	public boolean execute(RPGFrameworkInitCallback callback) {
+		if (callback!=null) {
+			callback.progressChanged(0);
+			callback.message("Download plugins");
+		}
+		
 		List<PluginDescriptor> local  = registry.getKnownPlugins();
 		// Remote plugins should only be the newest left, since step
 		// KeepNewestRemotePlugin has been running
 		List<PluginDescriptor> remote = registry.getKnownRemotePlugins(); 
 
 		List<PluginDescriptor> toUpdate = detectUpdates(local, remote);
-		downloadPlugins(toUpdate);
+		downloadPlugins(toUpdate, callback);
+		
+		if (callback!=null) {
+			callback.progressChanged(1.0);
+		}
 		return true;
 	}
 	
+	//-------------------------------------------------------------------
+	private synchronized void increase(RPGFrameworkInitCallback callback) {
+		count++;
+		float perc = ((float)count) / ((float)max);
+		if (callback!=null)
+			callback.progressChanged(perc);
+	}
 
 	//-------------------------------------------------------------------
-	private void downloadPlugins(List<PluginDescriptor> toDownload) {
+	private void downloadPlugins(List<PluginDescriptor> toDownload, RPGFrameworkInitCallback callback) {
 		logger.debug("downloadPlugins: "+toDownload.size());
+		max = toDownload.size();
+		count = 0;
+		
 		ThreadGroup tgDownloads = new ThreadGroup("DownloadUpdates");
 		List<Thread> threads = new ArrayList<Thread>();
 		for (PluginDescriptor desc : toDownload) {
@@ -169,6 +193,7 @@ public class UpdatePluginsStep implements BootStep {
 					desc.result = UpdateResult.FAILED;
 					logger.error("Update failed for "+desc.name+" - IOException",e);
 				}
+				increase(callback);
 			}, "Update-"+desc.name);
 			threads.add(thread);
 		}
@@ -265,7 +290,7 @@ public class UpdatePluginsStep implements BootStep {
 			if (remote.uuid!=null)
 				allMatchingLocal = findByUUID(remote.uuid, localList);
 			// If not found
-			if ( (allMatchingLocal==null || allMatchingLocal.isEmpty())  && registry.getPluginLoading(remote.uuid)) {
+			if ( (allMatchingLocal==null || allMatchingLocal.isEmpty())  && (remote.getState()==PluginState.STABLE || remote.getState()==PluginState.BETA ||registry.getPluginLoading(remote.uuid))) {
 				logger.info("Missing "+remote);
 				ret.add(remote);
 			}
