@@ -156,7 +156,6 @@ public class UpdatePluginsStep implements BootStep {
 					}
 					Path downloadFile = pluginDir.resolve(desc.filename+".update");
 					Path destFile = pluginDir.resolve(desc.filename);
-					Path backupFile = pluginDir.resolve(desc.filename+".backup");
 					// Delete eventually existing file
 					Files.deleteIfExists(downloadFile);
 					
@@ -170,7 +169,6 @@ public class UpdatePluginsStep implements BootStep {
 						return;
 					}
 					// Delete previous
-					Files.deleteIfExists(backupFile);
 					if (desc.localToUpdate!=null) {
 						if (desc.localToUpdate.localFile!=null) {
 							try {
@@ -180,9 +178,6 @@ public class UpdatePluginsStep implements BootStep {
 							}
 						}
 					}
-					// Backup previous file
-					if (Files.exists(destFile))
-						Files.move(destFile, backupFile);
 					// Mark downloaded as new regular
 					Files.move(downloadFile, destFile);
 					logger.info("  Successfully updated  "+desc.filename+" = "+desc.name);
