@@ -44,7 +44,7 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		// Add player specific path
 		localBaseDir = FileSystems.getDefault().getPath(dataDir, "custom");
 		if (!Files.exists(localBaseDir)) {
-			Files.createDirectory(localBaseDir);
+			Files.createDirectories(localBaseDir);
 		}
 		
 	}
@@ -63,7 +63,7 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		Path rpgDir = localBaseDir.resolve(rules.name().toLowerCase());
 		if (!Files.exists(rpgDir)) {
 			try {
-				Files.createDirectory(rpgDir);
+				Files.createDirectories(rpgDir);
 			} catch (IOException e) {
 				logger.error("Could not create custom data directory "+rpgDir,e);
 				return ret;
