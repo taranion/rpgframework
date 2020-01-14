@@ -57,7 +57,9 @@ public class CharacterProviderLoader {
 		list.add(plugin);
 		
 		BabylonConstants.logger.debug("Register plugin "+plugin.getClass()+" = "+plugin.getReadableName()+" for rules "+plugin.getRules());
-		descriptors.put(plugin, descriptor);
+		if (descriptor!=null) {
+			descriptors.put(plugin, descriptor);
+		}
 	}
 
 	//--------------------------------------------------------------------

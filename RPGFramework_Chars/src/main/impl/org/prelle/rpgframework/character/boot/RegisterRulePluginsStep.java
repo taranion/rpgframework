@@ -30,11 +30,11 @@ public class RegisterRulePluginsStep implements BootStep {
 
 	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
-	private Map<RoleplayingSystem,URLClassLoader> knownCores;
+	private Map<RoleplayingSystem,ClassLoader> knownCores;
 	
 	//-------------------------------------------------------------------
 	public RegisterRulePluginsStep() {
-		knownCores = new HashMap<RoleplayingSystem, URLClassLoader>();
+		knownCores = new HashMap<RoleplayingSystem, ClassLoader>();
 	}
 
 	//-------------------------------------------------------------------
@@ -75,7 +75,30 @@ public class RegisterRulePluginsStep implements BootStep {
 	}
 
 	//-------------------------------------------------------------------
-	public List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
+	private List<RulePlugin<?>> loadPluginFromClassPath() {
+		List<RulePlugin<?>> plugins = new ArrayList<>();
+		try {
+			logger.debug(" search for plugins in classpath");
+			ServiceLoader.load(RulePlugin.class).forEach(plugin -> {
+				Package pack = plugin.getClass().getPackage();
+				logger.debug("Found plugin "+plugin.getClass());
+				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
+
+				plugins.add(plugin);
+				if (plugin.getID().equals("CORE")) {
+					knownCores.put(plugin.getRules(), plugin.getClass().getClassLoader());
+				}
+
+			});
+		} catch (Throwable e) {
+			logger.fatal("Failed loading plugin(s) from classpath",e);
+		}
+
+		return plugins;
+	}
+
+	//-------------------------------------------------------------------
+	private List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
 			ClassLoader parent = PluginRegistry.class.getClassLoader();
@@ -119,7 +142,7 @@ public class RegisterRulePluginsStep implements BootStep {
 		CharacterProviderLoader.clearRulePlugins();
 		List<PluginDescriptor> installed = registry.getKnownPlugins();
 		
-		// Add local plugins to classpath
+		// Add local plugins to registry
 		for (PluginDescriptor pluginDesc : installed) {
 			int loaded = 0;
 			try {
@@ -143,6 +166,20 @@ public class RegisterRulePluginsStep implements BootStep {
 			}
 			logger.info("Loaded "+loaded+" plugins from "+pluginDesc.localFile);
 		}
+		callback.progressChanged(0.5);
+		
+		// Add plugins from classpath to registry
+		int loaded = 0;
+		for (RulePlugin<?> plugin : loadPluginFromClassPath()) {
+			if (CharacterProviderLoader.knownsPlugin(plugin)) {
+				continue;
+			}
+			logger.info("  Plugin '"+plugin.getClass()+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+			CharacterProviderLoader.registerRulePlugin(plugin, null);
+			loaded++;
+		}
+		logger.info("Loaded "+loaded+" plugins from classpath");
+				
 		
 		callback.progressChanged(1.0);
 		return true;
