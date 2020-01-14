@@ -81,7 +81,10 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		return ret;
 	}
 
-	//------------------------------------------------------------------
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.core.CustomDataHandler#getCustomData(de.rpgframework.core.RoleplayingSystem, java.lang.String)
+	 */
 	@Override
 	public CustomDataPackage getCustomData(RoleplayingSystem rules, String identifier) {
 		// Find directory specific to roleplaying system
@@ -93,11 +96,20 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		ret.datafile = rpgDir.resolve(identifier+".xml");
 		// Regular properties
 		try {
-			ret.properties = new PropertyResourceBundle(Files.newInputStream(rpgDir.resolve(identifier+".properties")));
-			// Help properties
+			Path path = rpgDir.resolve(identifier+".properties");
+			if (path!=null && Files.exists(path))
+				ret.properties = new PropertyResourceBundle(Files.newInputStream(rpgDir.resolve(identifier+".properties")));
+		} catch (IOException e) {
+			logger.error("Failed obtaining custom data for "+rules+"/"+identifier,e);
+			return null;
+		}
+		// Help properties
+		try {
 			Path helpPath = rpgDir.resolve(identifier+"-help.properties");
-			if (helpPath!=null)
+			if (helpPath!=null && Files.exists(helpPath))
 				ret.helpProperties = new PropertyResourceBundle(Files.newInputStream(helpPath));
+			else
+				logger.warn("Expect user provided translations in "+helpPath);
 		} catch (IOException e) {
 			logger.error("Failed obtaining custom data for "+rules+"/"+identifier,e);
 			return null;
