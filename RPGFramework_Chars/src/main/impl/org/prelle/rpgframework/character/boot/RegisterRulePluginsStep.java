@@ -1,11 +1,12 @@
 package org.prelle.rpgframework.character.boot;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,12 +30,11 @@ public class RegisterRulePluginsStep implements BootStep {
 
 	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
-	private List<URL> classloaderURLs;
-	private URLClassLoader pluginClassLoader;
+	private Map<RoleplayingSystem,ClassLoader> knownCores;
 	
 	//-------------------------------------------------------------------
 	public RegisterRulePluginsStep() {
-		classloaderURLs = new ArrayList<URL>();
+		knownCores = new HashMap<RoleplayingSystem, ClassLoader>();
 	}
 
 	//-------------------------------------------------------------------
@@ -85,9 +85,9 @@ public class RegisterRulePluginsStep implements BootStep {
 				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
 
 				plugins.add(plugin);
-//				if (plugin.getID().equals("CORE")) {
-//					knownCores.put(plugin.getRules(), plugin.getClass().getClassLoader());
-//				}
+				if (plugin.getID().equals("CORE")) {
+					knownCores.put(plugin.getRules(), plugin.getClass().getClassLoader());
+				}
 
 			});
 		} catch (Throwable e) {
@@ -101,18 +101,33 @@ public class RegisterRulePluginsStep implements BootStep {
 	private List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
+			ClassLoader parent = PluginRegistry.class.getClassLoader();
+			if (rules!=null && knownCores.containsKey(rules)) {
+				parent = knownCores.get(rules);
+			}
+			
+			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
 			try {
-				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, pluginClassLoader));
+				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader));
 			} catch (Exception e) {
-				logger.warn("#######iText Check of "+jarFile+" = Failed");
+				logger.warn("#######iText Check of "+jarFile+" = Failed 1");
+				try {
+					logger.warn("#######iText Check2 of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, PluginRegistry.class.getClassLoader()));
+				} catch (Exception ee) {
+					logger.warn("#######iText Check2 of "+jarFile+" = Failed");
+				}
 			}
 			logger.debug(" search for plugins in "+jarFile);
-			ServiceLoader.load(RulePlugin.class, pluginClassLoader).forEach(plugin -> {
+			ServiceLoader.load(RulePlugin.class, loader).forEach(plugin -> {
 				Package pack = plugin.getClass().getPackage();
 				logger.debug("Found plugin "+plugin.getClass());
 				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
 
 				plugins.add(plugin);
+				if (plugin.getID().equals("CORE")) {
+					knownCores.put(rules, loader);
+				}
+
 			});
 		} catch (Throwable e) {
 			logger.fatal("Failed loading plugin(s) from "+jarFile,e);
@@ -136,18 +151,6 @@ public class RegisterRulePluginsStep implements BootStep {
 		PluginRegistry registry = RPGFrameworkLoader.getInstance().getPluginRegistry();
 		CharacterProviderLoader.clearRulePlugins();
 		List<PluginDescriptor> installed = registry.getKnownPlugins();
-		
-		// Build a list of all URLs for the classloader
-		for (PluginDescriptor pluginDesc : installed) {
-			try {
-				classloaderURLs.add(pluginDesc.localFile.toUri().toURL());
-			} catch (MalformedURLException e) {
-				logger.fatal("Failed to convert to URL "+pluginDesc.localFile,e);
-			}
-		}
-		URL[] urls = classloaderURLs.toArray(new URL[classloaderURLs.size()]);
-		pluginClassLoader = new URLClassLoader(urls, PluginRegistry.class.getClassLoader());
-		callback.progressChanged(0.2);
 		
 		// Add local plugins to registry
 		for (PluginDescriptor pluginDesc : installed) {
