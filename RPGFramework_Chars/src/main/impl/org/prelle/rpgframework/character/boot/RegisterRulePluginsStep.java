@@ -98,16 +98,25 @@ public class RegisterRulePluginsStep implements BootStep {
 	}
 
 	//-------------------------------------------------------------------
+	public static String getClassloaderTree(ClassLoader loader) {
+		if (loader.getParent()==null || loader.getParent()==loader)
+			return loader.toString()+"("+loader.getName()+")";
+		else
+			return loader.toString()+"("+loader.getName()+") -> "+getClassloaderTree(loader.getParent());
+	}
+
+	//-------------------------------------------------------------------
 	private List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
 //			ClassLoader parent = PluginRegistry.class.getClassLoader();
-			ClassLoader parent = ClassLoader.getSystemClassLoader();
+			ClassLoader parent = getClass().getClassLoader();
 			if (rules!=null && knownCores.containsKey(rules)) {
 				parent = knownCores.get(rules);
 			}
 			
 			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
+			logger.warn("Classloaders = "+getClassloaderTree(loader));
 			try {
 				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader));
 			} catch (Exception e) {
@@ -115,7 +124,7 @@ public class RegisterRulePluginsStep implements BootStep {
 				try {
 					logger.warn("#######iText Check2 of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, PluginRegistry.class.getClassLoader()));
 				} catch (Exception ee) {
-					logger.warn("#######iText Check2 of "+jarFile+" = Failed");
+					logger.warn("#######iText Check2 of "+jarFile+" = Failed 2");
 				}
 			}
 			logger.debug(" search for plugins in "+jarFile);
@@ -123,7 +132,8 @@ public class RegisterRulePluginsStep implements BootStep {
 				Package pack = plugin.getClass().getPackage();
 				logger.debug("Found plugin "+plugin.getClass());
 				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
-
+				logger.info("  Found plugin "+plugin.getClass()+" from "+loader+" with parent "+loader.getParent());
+				
 				plugins.add(plugin);
 				if (plugin.getID().equals("CORE")) {
 					knownCores.put(rules, loader);
