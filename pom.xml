@@ -5,7 +5,7 @@
 
 	<groupId>de.rpgframework</groupId>
 	<artifactId>rpgframework-master</artifactId>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>RPGFramework</name>
@@ -43,7 +43,7 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.skip.deploy>false</maven.skip.deploy>
 		<openjfx.version>14-ea+7</openjfx.version>
-		<revision>4.0.0-SNAPSHOT</revision>
+		<revision>4.0.0</revision>
 	</properties>
 
 	<dependencyManagement>
@@ -62,7 +62,7 @@
 			<dependency>
 				<groupId>de.rpgframework</groupId>
 				<artifactId>rpgframework-core</artifactId>
-				<version>4.0.0-SNAPSHOT</version>
+				<version>${revision}</version>
 			</dependency>
 			<dependency>
 				<groupId>de.rpgframework</groupId>
@@ -112,7 +112,7 @@
 			<dependency>
 				<groupId>org.prelle</groupId>
 				<artifactId>simple-persist</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
