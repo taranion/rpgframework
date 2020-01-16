@@ -318,16 +318,15 @@ public class RPGFrameworkImpl implements RPGFramework {
 					/*
 					 * Check if BootStep shall be presented to user
 					 */
+					List<ConfigOption<?>> options = step.getConfiguration();
 					if (step.shallBeDisplayedToUser()) {
 						logger.info("  a) Display options to user from "+step.getClass());
-						List<ConfigOption<?>> options = step.getConfiguration();
 						if (callback!=null)
 							callback.showConfigOptions(step.getID(), options);
 						logger.debug("  b) Decisions");
 						for (ConfigOption<?> opt : options) {
 							logger.debug("   * "+opt.getLocalId()+" = "+opt.getValue());
 						}
-
 					}
 
 					RPGFrameworkInitCallback listener = new RPGFrameworkInitCallback() {
