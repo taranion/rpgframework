@@ -107,6 +107,11 @@ public class RegisterRulePluginsStep implements BootStep {
 			}
 			
 			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
+			try {
+				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader));
+			} catch (Exception e) {
+				logger.warn("#######iText Check of "+jarFile+" = Failed");
+			}
 			logger.debug(" search for plugins in "+jarFile);
 			ServiceLoader.load(RulePlugin.class, loader).forEach(plugin -> {
 				Package pack = plugin.getClass().getPackage();
@@ -157,7 +162,7 @@ public class RegisterRulePluginsStep implements BootStep {
 					if (CharacterProviderLoader.knownsPlugin(plugin)) {
 						continue;
 					}
-					logger.info("  Plugin '"+pluginDesc.name+"' has '"+plugin.getReadableName()+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+					logger.info("  Plugin '"+pluginDesc.name+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
 					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
 					loaded++;
 				}
