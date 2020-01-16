@@ -101,7 +101,8 @@ public class RegisterRulePluginsStep implements BootStep {
 	private List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
-			ClassLoader parent = PluginRegistry.class.getClassLoader();
+//			ClassLoader parent = PluginRegistry.class.getClassLoader();
+			ClassLoader parent = ClassLoader.getSystemClassLoader();
 			if (rules!=null && knownCores.containsKey(rules)) {
 				parent = knownCores.get(rules);
 			}
