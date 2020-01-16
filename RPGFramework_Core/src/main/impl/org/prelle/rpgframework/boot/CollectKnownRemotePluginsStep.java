@@ -123,7 +123,7 @@ public class CollectKnownRemotePluginsStep implements BootStep {
 		logger.info("Found "+available.size()+" downloadable plugins");
 
 		for (PluginDescriptor plugin : registry.getKnownRemotePlugins()) {
-			logger.info("  Remote Plugin "+plugin.uuid+"  \t"+plugin.location+"  Min="+plugin.minVersion+"  Max="+plugin.maxVersion);
+			logger.info("  Remote Plugin "+plugin.location+"  Min="+plugin.minVersion+"  Max="+plugin.maxVersion);
 		}
 		
 		return true;

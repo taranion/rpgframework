@@ -102,7 +102,7 @@ public class CollectKnownLocalPluginsStep implements BootStep {
 		getLocallyAvailablePlugins();
 
 		for (PluginDescriptor plugin : registry.getKnownPlugins()) {
-			logger.info("  Local Plugin "+plugin.uuid+"  \t"+plugin.localFile);
+			logger.info("  Local Plugin "+plugin.localFile);
 		}
 		
 		return true;

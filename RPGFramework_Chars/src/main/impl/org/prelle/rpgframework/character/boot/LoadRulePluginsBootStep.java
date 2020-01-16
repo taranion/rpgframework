@@ -87,6 +87,10 @@ public class LoadRulePluginsBootStep implements BootStep {
 	@Override
 	public List<ConfigOption<?>> getConfiguration() {
 		rulePlugins.clear();
+		
+		/*
+		 * Add only those plugins that match the language preference
+		 */
 		String searchLang = Locale.getDefault().getLanguage();
 		if (!(searchLang.equalsIgnoreCase("de") || searchLang.equalsIgnoreCase("en")))
 			searchLang = "en";
@@ -169,6 +173,9 @@ public class LoadRulePluginsBootStep implements BootStep {
 		if (callback!=null) {
 			callback.progressChanged(0);
 			callback.message("Initialize rule plugins");
+		}
+		if (rulePlugins.size()==0) {
+			logger.fatal("\n\nThere are no RulePlugins available!!\n\n");
 		}
 
 
