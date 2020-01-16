@@ -115,14 +115,17 @@ public class RegisterRulePluginsStep implements BootStep {
 				parent = knownCores.get(rules);
 			}
 			
-			URLClassLoader loader = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
+			URLClassLoader outer = URLClassLoader.newInstance(new URL[]{jarFile.toUri().toURL()}, parent);
+			ClassLoader loader = new ClassLoader(jarFile.getFileName().toString(), outer) {
+				
+			};
 			logger.warn("Classloaders = "+getClassloaderTree(loader));
 			try {
 				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader));
 			} catch (Exception e) {
 				logger.warn("#######iText Check of "+jarFile+" = Failed 1");
 				try {
-					logger.warn("#######iText Check2 of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, PluginRegistry.class.getClassLoader()));
+					logger.warn("#######iText Check2 of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader.getParent()));
 				} catch (Exception ee) {
 					logger.warn("#######iText Check2 of "+jarFile+" = Failed 2");
 				}
