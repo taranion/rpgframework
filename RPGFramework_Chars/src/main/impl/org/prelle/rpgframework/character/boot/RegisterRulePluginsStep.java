@@ -195,7 +195,7 @@ public class RegisterRulePluginsStep implements BootStep {
 			logger.info("  after sort = "+entry.getValue());
 			installed.addAll(entry.getValue());
 		}
-		
+		logger.info("Load order: "+installed);
 		
 		// Add local plugins to registry
 		for (PluginDescriptor pluginDesc : installed) {
@@ -209,10 +209,11 @@ public class RegisterRulePluginsStep implements BootStep {
 				}
 				
 				for (RulePlugin<?> plugin : loadPlugin(rules, pluginDesc.localFile)) {
+					// Do not load what is already loaded by the IDE
 					if (CharacterProviderLoader.knownsPlugin(plugin)) {
 						continue;
 					}
-					logger.info("  Plugin '"+pluginDesc.name+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
+					logger.info("Plugin '"+pluginDesc.name+"' for "+plugin.getRules()+" and languages "+plugin.getLanguages());
 					CharacterProviderLoader.registerRulePlugin(plugin, pluginDesc);
 					loaded++;
 				}
