@@ -116,6 +116,8 @@ public class PluginRegistryImpl implements PluginRegistry {
 				case "State"     : ret.state      = PluginState.valueOf(val); break;
 				case "MinVersion": ret.minVersion = Version.parse(val); break;
 				case "MaxVersion": ret.maxVersion = Version.parse(val); break;
+				case "Provides"  : ret.provides   = val; break;
+				case "Requires"  : ret.requires   = val.split(","); break;
 				}
 			} catch (Exception e) {
 				logger.warn("Failed parsing manifest header of '"+ret.name+"': "+entry.getKey()+" = "+entry.getValue());

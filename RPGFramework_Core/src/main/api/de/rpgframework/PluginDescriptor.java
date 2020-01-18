@@ -23,6 +23,10 @@ public class PluginDescriptor implements Comparable<PluginDescriptor> {
 	public Version minVersion;
 	/* Required maximum framework version */
 	public Version maxVersion;
+	/* Required plugins within same roleplaying system*/
+	public String[] requires = new String[0];
+	/* Provided requirement */
+	public String provides;
 	
 	public URL location;
 	public String filename;
@@ -32,7 +36,7 @@ public class PluginDescriptor implements Comparable<PluginDescriptor> {
 	public URL homepage;
 	public URL bugtracker;
 	public String toString() {
-		return "Plugin(filename="+filename+", name="+name+", vendor="+vendor+", version="+version+", size="+fileSize+", time="+timestamp+", state="+state+")";
+		return "Plugin("+filename+")";
 	}
 	public transient Path localFile; 
 	public transient UpdateResult result;

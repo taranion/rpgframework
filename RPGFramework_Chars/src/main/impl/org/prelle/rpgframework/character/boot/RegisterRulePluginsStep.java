@@ -4,9 +4,13 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
 
 import org.apache.logging.log4j.LogManager;
@@ -98,14 +102,6 @@ public class RegisterRulePluginsStep implements BootStep {
 	}
 
 	//-------------------------------------------------------------------
-	public static String getClassloaderTree(ClassLoader loader) {
-		if (loader.getParent()==null || loader.getParent()==loader)
-			return loader.toString()+"("+loader.getName()+")";
-		else
-			return loader.toString()+"("+loader.getName()+") -> "+getClassloaderTree(loader.getParent());
-	}
-
-	//-------------------------------------------------------------------
 	private List<RulePlugin<?>> loadPlugin(RoleplayingSystem rules, Path jarFile) {
 		List<RulePlugin<?>> plugins = new ArrayList<>();
 		try {
@@ -119,23 +115,11 @@ public class RegisterRulePluginsStep implements BootStep {
 			ClassLoader loader = new ClassLoader(jarFile.getFileName().toString(), outer) {
 				
 			};
-			logger.warn("Classloaders = "+getClassloaderTree(loader));
-			try {
-				logger.warn("#######iText Check of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader));
-			} catch (Exception e) {
-				logger.warn("#######iText Check of "+jarFile+" = Failed 1");
-				try {
-					logger.warn("#######iText Check2 of "+jarFile+" = "+Class.forName("com.itextpdf.text.DocumentException", false, loader.getParent()));
-				} catch (Exception ee) {
-					logger.warn("#######iText Check2 of "+jarFile+" = Failed 2");
-				}
-			}
 			logger.debug(" search for plugins in "+jarFile);
 			ServiceLoader.load(RulePlugin.class, loader).forEach(plugin -> {
 				Package pack = plugin.getClass().getPackage();
 				logger.debug("Found plugin "+plugin.getClass());
 				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion()+"   Name: "+plugin.getReadableName());
-				logger.info("  Found plugin "+plugin.getClass()+" from "+loader+" with parent "+loader.getParent());
 				
 				plugins.add(plugin);
 				if (plugin.getID().equals("CORE")) {
@@ -165,6 +149,53 @@ public class RegisterRulePluginsStep implements BootStep {
 		PluginRegistry registry = RPGFrameworkLoader.getInstance().getPluginRegistry();
 		CharacterProviderLoader.clearRulePlugins();
 		List<PluginDescriptor> installed = registry.getKnownPlugins();
+		
+		/*
+		 * Make a list of PluginDescriptors per RPG
+		 */
+		Map<RoleplayingSystem, List<PluginDescriptor>> listByRPG = new HashMap<RoleplayingSystem, List<PluginDescriptor>>();
+		for (PluginDescriptor pluginDesc : installed) {
+			try {
+				RoleplayingSystem rules = RoleplayingSystem.valueOf(pluginDesc.system);
+				List<PluginDescriptor> list = listByRPG.get(rules);
+				if (list==null) {
+					list = new ArrayList<PluginDescriptor>();
+					listByRPG.put(rules, list);
+				}
+				list.add(pluginDesc);
+			} catch (Exception e) {
+				logger.fatal("Cannot sort plugin for system "+pluginDesc.system+": "+e);
+			}
+		}
+		
+		/*
+		 * Now sort all plugins in a way that plugins that reflects their
+		 * dependencies
+		 */
+		installed = new ArrayList<PluginDescriptor>();
+		for (Entry<RoleplayingSystem, List<PluginDescriptor>> entry : listByRPG.entrySet()) {
+			logger.info("For "+entry.getKey()+" = "+entry.getValue());
+			Collections.sort(entry.getValue(), new Comparator<PluginDescriptor>() {
+				public int compare(PluginDescriptor o1, PluginDescriptor o2) {
+					if (o1.requires.length==0 || o2.requires.length>0)
+						return -1;
+					if (o1.requires.length>0 || o2.requires.length==0)
+						return o1.requires.length;
+					if (o1.requires.length==0 || o2.requires.length==0)
+						return 0;
+					if (o1.provides!=null || Arrays.asList(o2.requires).contains(o1.provides))
+						return -1;
+					if (o2.provides!=null || Arrays.asList(o1.requires).contains(o2.provides))
+						return +1;
+					logger.error("HUH");
+					System.err.println("Sort problem RegisterRulePluginStep");
+					return 0;
+				}
+			});
+			logger.info("  after sort = "+entry.getValue());
+			installed.addAll(entry.getValue());
+		}
+		
 		
 		// Add local plugins to registry
 		for (PluginDescriptor pluginDesc : installed) {
