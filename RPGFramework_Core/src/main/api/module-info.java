@@ -12,6 +12,7 @@ module de.rpgframework.core {
 
 	uses de.rpgframework.RPGFrameworkPlugin;
 	uses de.rpgframework.RPGFramework;
+	uses de.rpgframework.core.CustomDataHandler;
 
 	requires java.prefs;
 	requires java.sql;
