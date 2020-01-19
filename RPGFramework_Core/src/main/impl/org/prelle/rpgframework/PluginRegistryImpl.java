@@ -7,6 +7,7 @@ import java.lang.module.ModuleDescriptor.Version;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,7 @@ public class PluginRegistryImpl implements PluginRegistry {
 	private ConfigOption<String> cfgLoadUUIDs;
 	private List<String> loadUUIDs = new ArrayList<String>();
 	private List<String> updateErrors = new ArrayList<String>();
+	private List<PluginDescriptor> toDelete = new ArrayList<PluginDescriptor>();
 
 	//-------------------------------------------------------------------
 	public void init(ConfigContainer configRoot) {
@@ -57,6 +59,19 @@ public class PluginRegistryImpl implements PluginRegistry {
 			loadUUIDs.add(tok.nextToken().toLowerCase());
 		}
 		logger.info("init(): plugins are "+cfgLoadUUIDs.getValue());
+		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				logger.info("Deleting outdated plugins");
+				for (PluginDescriptor desc : toDelete) {
+					try {
+						Files.deleteIfExists(desc.localFile);
+					} catch (IOException e) {
+						logger.error("Failed deleting "+desc.localFile);
+					}
+				}
+			}
+		});
 	}
 
 	//-------------------------------------------------------------------
@@ -240,6 +255,8 @@ public class PluginRegistryImpl implements PluginRegistry {
 
 	//-------------------------------------------------------------------
 	public void unregisterRemote(PluginDescriptor descriptor) {
+		toDelete.add(descriptor);
+		
 		List<PluginDescriptor> list = remotePlugins.get(descriptor.uuid);
 		if (list==null) 
 			return;
@@ -269,6 +286,17 @@ public class PluginRegistryImpl implements PluginRegistry {
 	//-------------------------------------------------------------------
 	public void addUpdateError(String msg) {
 		updateErrors.add(msg);
+	}
+
+	//-------------------------------------------------------------------
+	@Override
+	public List<PluginDescriptor> getPluginsToDelete() {
+		return toDelete;
+	}
+
+	//-------------------------------------------------------------------
+	public void addPluginToDeleteOnExit(PluginDescriptor desc) {
+		toDelete.add(desc);
 	}
 	
 }

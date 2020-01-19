@@ -21,5 +21,7 @@ public interface PluginRegistry {
 	public int getNumberOfPluginsToLoad();
 
 	public List<PluginDescriptor> getKnownRemotePlugins();
+
+	public List<PluginDescriptor> getPluginsToDelete();
 	
 }

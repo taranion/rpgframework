@@ -184,7 +184,7 @@ public class UpdatePluginsStep implements BootStep {
 //					Files.deleteIfExists(downloadFile);
 					
 					logger.debug("  Download "+desc.location+" to "+downloadFile);
-					Files.copy(con.getInputStream(), downloadFile);
+					Files.copy(con.getInputStream(), downloadFile, StandardCopyOption.REPLACE_EXISTING);
 					con.getInputStream().close();
 					// Verify downloaded file
 					if (downloadFile.toFile().length()!=desc.fileSize) {
@@ -229,6 +229,8 @@ public class UpdatePluginsStep implements BootStep {
 				} catch (IOException e) {
 					desc.result = UpdateResult.FAILED;
 					logger.error("Update failed for "+desc.name+" - IOException",e);
+					// Mark plugin to be deleted on exit
+					registry.addPluginToDeleteOnExit(desc);
 					registry.addUpdateError("Failed updating "+desc.name+" - "+e);
 				}
 				increase(callback);
