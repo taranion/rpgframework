@@ -184,14 +184,24 @@ public class UpdatePluginsStep implements BootStep {
 //					Files.deleteIfExists(downloadFile);
 					
 					logger.debug("  Download "+desc.location+" to "+downloadFile);
-					Files.copy(con.getInputStream(), downloadFile, StandardCopyOption.REPLACE_EXISTING);
-					con.getInputStream().close();
-					// Verify downloaded file
-					if (downloadFile.toFile().length()!=desc.fileSize) {
-						logger.warn("Download okay, but filesize does not match");
-						registry.addUpdateError("Failed updaing "+downloadFile+" - verification failed");
-						desc.result = UpdateResult.VERIFICATION_FAILED;
+					try {
+						Files.copy(con.getInputStream(), downloadFile, StandardCopyOption.REPLACE_EXISTING);
+						// Verify downloaded file
+						if (downloadFile.toFile().length()!=desc.fileSize) {
+							logger.warn("Download okay, but filesize does not match");
+							registry.addUpdateError("Failed updaing "+downloadFile+" - verification failed");
+							desc.result = UpdateResult.VERIFICATION_FAILED;
+							return;
+						}
+					} catch (IOException e) {
+						// Failed updating
+						logger.error("Failed updating '"+desc.getName()+"': "+e);
+						registry.addUpdateError("Plugins to be updated on next start: "+desc.name);
+						desc.result = UpdateResult.FAILED;
+						registry.addPluginToDeleteOnExit(desc);
 						return;
+					} finally {
+						con.getInputStream().close();
 					}
 //					// Delete previous
 //					try {

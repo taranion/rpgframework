@@ -105,7 +105,6 @@ public class KeepNewestRemotePluginStep implements BootStep {
 		// Remove older versions
 		for (PluginDescriptor deleteMe : toDelete) {
 			logger.warn("Unregister remote, because it is outdated: "+deleteMe);
-			deleteMe.localFile.toFile().deleteOnExit();
 			registry.unregisterRemote(deleteMe);
 		}
 		
