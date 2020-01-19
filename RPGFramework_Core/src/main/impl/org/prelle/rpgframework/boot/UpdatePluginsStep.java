@@ -179,8 +179,9 @@ public class UpdatePluginsStep implements BootStep {
 					}
 					Path downloadFile = pluginDir.resolve(desc.filename+".update");
 					Path destFile = pluginDir.resolve(desc.filename);
+					downloadFile = destFile;
 					// Delete eventually existing file
-					Files.deleteIfExists(downloadFile);
+//					Files.deleteIfExists(downloadFile);
 					
 					logger.debug("  Download "+desc.location+" to "+downloadFile);
 					Files.copy(con.getInputStream(), downloadFile);
@@ -192,24 +193,24 @@ public class UpdatePluginsStep implements BootStep {
 						desc.result = UpdateResult.VERIFICATION_FAILED;
 						return;
 					}
-					// Delete previous
-					try {
-						logger.info("  delete old "+destFile);
-						deleteMappedFilesIfExists(destFile);
-					} catch (Exception e) {
-//						// Try to rename
-//						Path oldFile = pluginDir.resolve(desc.filename+".old");
-//						try {
-//							logger.debug("  try move "+destFile+"  to "+oldFile);
-//							Files.move(destFile, oldFile, StandardCopyOption.REPLACE_EXISTING);
-//							oldFile.toFile().deleteOnExit();
-//						} catch (Exception e1) {
-							logger.error("Update failed for "+desc.name+" - since deleting old "+destFile+" failed",e);
-							registry.addUpdateError("Failed updating "+desc.name+" - cannot delete "+destFile);
-							desc.result = UpdateResult.FAILED;
-							return;
-//						}
-					}
+//					// Delete previous
+//					try {
+//						logger.info("  delete old "+destFile);
+//						deleteMappedFilesIfExists(destFile);
+//					} catch (Exception e) {
+////						// Try to rename
+////						Path oldFile = pluginDir.resolve(desc.filename+".old");
+////						try {
+////							logger.debug("  try move "+destFile+"  to "+oldFile);
+////							Files.move(destFile, oldFile, StandardCopyOption.REPLACE_EXISTING);
+////							oldFile.toFile().deleteOnExit();
+////						} catch (Exception e1) {
+//							logger.error("Update failed for "+desc.name+" - since deleting old "+destFile+" failed",e);
+//							registry.addUpdateError("Failed updating "+desc.name+" - cannot delete "+destFile);
+//							desc.result = UpdateResult.FAILED;
+//							return;
+////						}
+//					}
 //					if (desc.localToUpdate!=null) {
 //						if (desc.localToUpdate.localFile!=null) {
 //							try {
@@ -220,7 +221,7 @@ public class UpdatePluginsStep implements BootStep {
 //						}
 //					}
 					// Mark downloaded as new regular
-					Files.move(downloadFile, destFile);
+//					Files.move(downloadFile, destFile);
 					logger.info("  Successfully updated  "+desc.filename+" = "+desc.name);
 					desc.localFile = destFile;
 					desc.result = UpdateResult.UPDATED;
