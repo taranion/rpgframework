@@ -99,6 +99,8 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 			Path path = rpgDir.resolve(identifier+".properties");
 			if (path!=null && Files.exists(path))
 				ret.properties = new PropertyResourceBundle(Files.newInputStream(rpgDir.resolve(identifier+".properties")));
+			else if (!"fallback".equals(identifier))
+				logger.error("Expect custom data property file "+path);
 		} catch (IOException e) {
 			logger.error("Failed obtaining custom data for "+rules+"/"+identifier,e);
 			return null;
@@ -108,6 +110,8 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 			Path helpPath = rpgDir.resolve(identifier+"-help.properties");
 			if (helpPath!=null && Files.exists(helpPath))
 				ret.helpProperties = new PropertyResourceBundle(Files.newInputStream(helpPath));
+			else if (!"fallback".equals(identifier))
+				logger.error("Expect custom data help property file "+helpPath);
 			else
 				logger.warn("Expect user provided translations in "+helpPath);
 		} catch (IOException e) {
