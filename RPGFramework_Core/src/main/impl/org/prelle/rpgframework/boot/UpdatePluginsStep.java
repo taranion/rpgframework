@@ -5,6 +5,7 @@ package org.prelle.rpgframework.boot;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -135,7 +136,29 @@ public class UpdatePluginsStep implements BootStep {
 		if (callback!=null)
 			callback.progressChanged(perc);
 	}
-
+	
+	//-------------------------------------------------------------------
+	private static void deleteMappedFilesIfExists(Path path) throws IOException {
+		int max = 20;
+		IOException ee = null;
+	    while (max>0) {
+	    	max--;
+	        try {
+	            Files.deleteIfExists(path);
+	            return;
+	        } catch (AccessDeniedException e) {
+	        	ee = e;
+	            System.gc();
+	        }
+	        try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				return;
+			}
+	    }
+	    throw ee;
+	}
+	
 	//-------------------------------------------------------------------
 	private void downloadPlugins(List<PluginDescriptor> toDownload, RPGFrameworkInitCallback callback) {
 		logger.debug("downloadPlugins: "+toDownload.size());
@@ -169,17 +192,20 @@ public class UpdatePluginsStep implements BootStep {
 					}
 					// Delete previous
 					try {
-						logger.debug("  delete old "+destFile);
-						Files.deleteIfExists(destFile);
+						logger.info("  delete old "+destFile);
+						deleteMappedFilesIfExists(destFile);
 					} catch (Exception e) {
-						// Try to rename
-						Path oldFile = pluginDir.resolve(desc.filename+".old");
-						try {
-							logger.debug("  try move "+destFile+"  to "+oldFile);
-							Files.move(destFile, oldFile, StandardCopyOption.REPLACE_EXISTING);
-							oldFile.toFile().deleteOnExit();
-						} catch (Exception e1) {
-						}
+//						// Try to rename
+//						Path oldFile = pluginDir.resolve(desc.filename+".old");
+//						try {
+//							logger.debug("  try move "+destFile+"  to "+oldFile);
+//							Files.move(destFile, oldFile, StandardCopyOption.REPLACE_EXISTING);
+//							oldFile.toFile().deleteOnExit();
+//						} catch (Exception e1) {
+							logger.error("Update failed for "+desc.name+" - since deleting old "+destFile+" failed",e);
+							desc.result = UpdateResult.FAILED;
+							return;
+//						}
 					}
 //					if (desc.localToUpdate!=null) {
 //						if (desc.localToUpdate.localFile!=null) {
