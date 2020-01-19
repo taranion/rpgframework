@@ -169,15 +169,16 @@ public class UpdatePluginsStep implements BootStep {
 						return;
 					}
 					// Delete previous
-					if (desc.localToUpdate!=null) {
-						if (desc.localToUpdate.localFile!=null) {
-							try {
-								Files.delete(desc.localToUpdate.localFile);
-							} catch (Exception e) {
-								logger.error("Delete failed for "+desc.localToUpdate.localFile,e);
-							}
-						}
-					}
+					Files.deleteIfExists(destFile);
+//					if (desc.localToUpdate!=null) {
+//						if (desc.localToUpdate.localFile!=null) {
+//							try {
+//								Files.delete(desc.localToUpdate.localFile);
+//							} catch (Exception e) {
+//								logger.error("Delete failed for "+desc.localToUpdate.localFile,e);
+//							}
+//						}
+//					}
 					// Mark downloaded as new regular
 					Files.move(downloadFile, destFile);
 					logger.info("  Successfully updated  "+desc.filename+" = "+desc.name);
