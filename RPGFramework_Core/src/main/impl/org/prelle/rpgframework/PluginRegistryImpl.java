@@ -47,6 +47,7 @@ public class PluginRegistryImpl implements PluginRegistry {
 	
 	private ConfigOption<String> cfgLoadUUIDs;
 	private List<String> loadUUIDs = new ArrayList<String>();
+	private List<String> updateErrors = new ArrayList<String>();
 
 	//-------------------------------------------------------------------
 	public void init(ConfigContainer configRoot) {
@@ -84,10 +85,10 @@ public class PluginRegistryImpl implements PluginRegistry {
 		} while (true);
 		try {
 			stream.close();
-			System.gc();
 		} catch (Exception e) {
 			logger.fatal("Failed closing JAR: "+e);
 		}
+		System.gc();
 
 		return ret;
 	}
@@ -258,6 +259,16 @@ public class PluginRegistryImpl implements PluginRegistry {
 			logger.info("Updated local plugin "+descriptor);
 			localPlugins.put(descriptor.uuid, descriptor);
 		}
+	}
+
+	//-------------------------------------------------------------------
+	public List<String> getUpdateErrors() {
+		return updateErrors;
+	}
+
+	//-------------------------------------------------------------------
+	public void addUpdateError(String msg) {
+		updateErrors.add(msg);
 	}
 	
 }

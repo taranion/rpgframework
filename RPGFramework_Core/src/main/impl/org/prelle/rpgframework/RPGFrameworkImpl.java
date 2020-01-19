@@ -61,7 +61,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 	private List<BootStep> customSteps;
 	private double percentStart = 0;
 	private PluginRegistryImpl pluginRegistry;
-
+	
 	//--------------------------------------------------------------------
 	public static void main(String[] args) {
 		new RPGFrameworkImpl();
@@ -382,6 +382,15 @@ public class RPGFrameworkImpl implements RPGFramework {
 	@Override
 	public PluginRegistry getPluginRegistry() {
 		return pluginRegistry;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.RPGFramework#getUpdateErrors()
+	 */
+	@Override
+	public List<String> getUpdateErrors() {
+		return pluginRegistry.getUpdateErrors();
 	}
 
 	//	//-------------------------------------------------------------------

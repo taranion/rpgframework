@@ -3,6 +3,8 @@
  */
 package de.rpgframework;
 
+import java.util.List;
+
 import de.rpgframework.boot.BootStep;
 import de.rpgframework.boot.StandardBootSteps;
 import de.rpgframework.core.LicenseManager;
@@ -46,5 +48,8 @@ public interface RPGFramework {
 
 	//-------------------------------------------------------------------
 	public PluginRegistry getPluginRegistry();
+
+	//-------------------------------------------------------------------
+	public List<String> getUpdateErrors();
 
 }

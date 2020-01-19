@@ -156,6 +156,7 @@ public class UpdatePluginsStep implements BootStep {
 				return;
 			}
 	    }
+	    path.toFile().deleteOnExit();
 	    throw ee;
 	}
 	
@@ -187,6 +188,7 @@ public class UpdatePluginsStep implements BootStep {
 					// Verify downloaded file
 					if (downloadFile.toFile().length()!=desc.fileSize) {
 						logger.warn("Download okay, but filesize does not match");
+						registry.addUpdateError("Failed updaing "+downloadFile+" - verification failed");
 						desc.result = UpdateResult.VERIFICATION_FAILED;
 						return;
 					}
@@ -203,6 +205,7 @@ public class UpdatePluginsStep implements BootStep {
 //							oldFile.toFile().deleteOnExit();
 //						} catch (Exception e1) {
 							logger.error("Update failed for "+desc.name+" - since deleting old "+destFile+" failed",e);
+							registry.addUpdateError("Failed updating "+desc.name+" - cannot delete "+destFile);
 							desc.result = UpdateResult.FAILED;
 							return;
 //						}
@@ -225,6 +228,7 @@ public class UpdatePluginsStep implements BootStep {
 				} catch (IOException e) {
 					desc.result = UpdateResult.FAILED;
 					logger.error("Update failed for "+desc.name+" - IOException",e);
+					registry.addUpdateError("Failed updating "+desc.name+" - "+e);
 				}
 				increase(callback);
 			}, "Update-"+desc.name);
