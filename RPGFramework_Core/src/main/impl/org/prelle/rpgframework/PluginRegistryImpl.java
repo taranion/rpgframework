@@ -82,6 +82,11 @@ public class PluginRegistryImpl implements PluginRegistry {
 				return ret;
 			}
 		} while (true);
+		try {
+			stream.close();
+		} catch (Exception e) {
+			logger.fatal("Failed closing JAR: "+e);
+		}
 
 		return ret;
 	}

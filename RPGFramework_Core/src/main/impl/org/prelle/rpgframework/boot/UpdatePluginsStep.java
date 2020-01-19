@@ -5,11 +5,10 @@ package org.prelle.rpgframework.boot;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -169,7 +168,19 @@ public class UpdatePluginsStep implements BootStep {
 						return;
 					}
 					// Delete previous
-					Files.deleteIfExists(destFile);
+					try {
+						logger.debug("  delete old "+destFile);
+						Files.deleteIfExists(destFile);
+					} catch (Exception e) {
+						// Try to rename
+						Path oldFile = pluginDir.resolve(desc.filename+".old");
+						try {
+							logger.debug("  try move "+destFile+"  to "+oldFile);
+							Files.move(destFile, oldFile, StandardCopyOption.REPLACE_EXISTING);
+							oldFile.toFile().deleteOnExit();
+						} catch (Exception e1) {
+						}
+					}
 //					if (desc.localToUpdate!=null) {
 //						if (desc.localToUpdate.localFile!=null) {
 //							try {
