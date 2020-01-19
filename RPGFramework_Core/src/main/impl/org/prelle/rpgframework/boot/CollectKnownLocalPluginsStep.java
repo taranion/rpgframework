@@ -9,6 +9,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,8 +136,11 @@ public class CollectKnownLocalPluginsStep implements BootStep {
 			Files.newDirectoryStream(pluginDir, "*.jar").forEach(jarPath -> {
 				logger.debug("JAR "+jarPath);
 				try {
-					URL url = jarPath.toUri().toURL();
+					Path temp = Files.createTempFile(jarPath.getFileName().toString(), "jar");
+					Files.copy(jarPath, temp, StandardCopyOption.REPLACE_EXISTING);
+					URL url = temp.toUri().toURL();
 					PluginDescriptor descr = registry.getPluginInfo(url);
+					temp.toFile().deleteOnExit();
 					descr.fileSize = (int) jarPath.toFile().length();
 					descr.localFile= jarPath;
 					descr.filename = jarPath.getFileName().toString();
