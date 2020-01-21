@@ -87,6 +87,7 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 	 */
 	@Override
 	public CustomDataPackage getCustomData(RoleplayingSystem rules, String identifier) {
+		logger.error("\n\nHere\n\n");
 		// Find directory specific to roleplaying system
 		Path rpgDir = localBaseDir.resolve(rules.name().toLowerCase());
 		

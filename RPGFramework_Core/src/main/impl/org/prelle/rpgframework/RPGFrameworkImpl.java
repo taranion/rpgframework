@@ -243,17 +243,21 @@ public class RPGFrameworkImpl implements RPGFramework {
 
 			List<BootStep> bootSteps = new ArrayList<BootStep>();
 			
+			boolean runInIDE = System.getProperty("profile","no-profile").equals("no-profile");
+			
 			/*
 			 * 1. Boot steps to make before contacting extensions.
 			 *    These steps can't be disabled
 			 */
 			logger.info("1. Add minimal boot steps");
-			Version frameworkVersion = detectFrameworkVersion();
-			bootSteps.add(new CollectKnownLocalPluginsStep(pluginRegistry));
-			bootSteps.add(new CollectKnownRemotePluginsStep(frameworkVersion, pluginRegistry));
-			bootSteps.add(new IgnoreNotMatchingRemotePlugins(frameworkVersion, pluginRegistry));
-			bootSteps.add(new KeepNewestRemotePluginStep(pluginRegistry));
-			bootSteps.add(new UpdatePluginsStep(pluginRegistry));
+			if (!runInIDE) {
+				Version frameworkVersion = detectFrameworkVersion();
+				bootSteps.add(new CollectKnownLocalPluginsStep(pluginRegistry));
+				bootSteps.add(new CollectKnownRemotePluginsStep(frameworkVersion, pluginRegistry));
+				bootSteps.add(new IgnoreNotMatchingRemotePlugins(frameworkVersion, pluginRegistry));
+				bootSteps.add(new KeepNewestRemotePluginStep(pluginRegistry));
+				bootSteps.add(new UpdatePluginsStep(pluginRegistry));
+			}
 			
 			/*
 			 * 2. Add optional boot steps that can be selected by the application
