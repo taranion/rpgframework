@@ -100,12 +100,13 @@ public class BaseCharacterHandleLight implements CharacterHandle {
 			logger.debug("Try to decode character");
 			CommandResult result = null;
 			try {
+				logger.info("Decode character "+attach.getFilename());
 				result = CommandBus.fireCommand(this, CommandType.DECODE, 
 						ruleIdentifier,
 						attach.getData()
 						);
 			} catch (Exception e) {
-				logger.error("Failec decoding character",e);
+				logger.error("Failed decoding character",e);
 				StringWriter out = new StringWriter();
 				e.printStackTrace(new PrintWriter(out));
 				result = new CommandResult(CommandType.DECODE, false, out.toString());
