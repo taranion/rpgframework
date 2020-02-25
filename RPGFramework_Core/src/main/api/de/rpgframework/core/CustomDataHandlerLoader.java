@@ -43,7 +43,7 @@ public class CustomDataHandlerLoader {
 			}
 		}
 
-		logger.fatal("No implementation of "+CustomDataHandler.class+" found");
+//		logger.fatal("No implementation of "+CustomDataHandler.class+" found");
 		return null;
 	}
 
