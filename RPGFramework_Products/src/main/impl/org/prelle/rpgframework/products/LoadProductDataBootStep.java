@@ -92,12 +92,31 @@ public class LoadProductDataBootStep implements BootStep {
 	}
 
 	//-------------------------------------------------------------------
+	private List<ProductDataPlugin> loadPluginFromClassPath() {
+		List<ProductDataPlugin> plugins = new ArrayList<>();
+		try {
+			logger.debug(" search for plugins in classpath");
+			ServiceLoader.load(ProductDataPlugin.class).forEach(plugin -> {
+				Package pack = plugin.getClass().getPackage();
+				logger.debug("Found plugin "+plugin.getClass());
+				logger.debug("  Implementor: "+pack.getImplementationVendor()+"   Version: "+pack.getImplementationVersion());
+
+				plugins.add(plugin);
+			});
+		} catch (Throwable e) {
+			logger.fatal("Failed loading plugin(s) from classpath",e);
+		}
+
+		return plugins;
+	}
+
+	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.boot.BootStep#execute()
 	 */
 	@Override
 	public boolean execute(RPGFrameworkInitCallback callback) {
-		logger.debug("START----------Load product data------------------------");
+		logger.info("START----------Load product data------------------------");
 		
 		logger.debug("  load instances of "+ProductDataPlugin.class);
 		PluginRegistry registry = RPGFrameworkLoader.getInstance().getPluginRegistry();
@@ -117,6 +136,14 @@ public class LoadProductDataBootStep implements BootStep {
 			}
 			logger.debug("Loaded "+loaded+" plugins from "+pluginDesc.localFile);
 		}
+		
+		// Add plugins from classpath to registry
+		int loaded = 0;
+		for (ProductDataPlugin plugin : loadPluginFromClassPath()) {
+			plugin.initialize(RPGFrameworkLoader.getInstance(), service);
+			loaded++;
+		}
+		logger.info("Loaded "+loaded+" plugins from classpath");
 		
 		logger.debug("STOP ----------Load product data-------------------------");
 		// TODO Auto-generated method stub
