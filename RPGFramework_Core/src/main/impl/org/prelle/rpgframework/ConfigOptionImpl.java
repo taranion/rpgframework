@@ -222,7 +222,6 @@ public class ConfigOptionImpl<T> extends ConfigNodeImpl implements ConfigOption<
 				PREF.put(getLocalId(), String.valueOf(newVal));
 				break;
 			default:
-
 				PREF.put(getLocalId(), String.valueOf(newVal));
 			}
 		}

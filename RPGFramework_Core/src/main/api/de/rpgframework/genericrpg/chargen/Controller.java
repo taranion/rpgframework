@@ -25,5 +25,11 @@ public interface Controller {
 	 * Returns a list of steps to do in this controller
 	 */
 	public List<ToDoElement> getToDos();
+	
+	//-------------------------------------------------------------------
+	/**
+	 * Completely randomize every selection
+	 */
+	public void roll();
 
 }
