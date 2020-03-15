@@ -122,14 +122,20 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 		String dirName = system.name().toLowerCase();
 		Path systemDir = myselfPlayerDir.resolve(dirName);
 		Path charDir   = systemDir.resolve(name);
-		if (!Files.exists(charDir))
+		if (!Files.exists(charDir)) {
 			Files.createDirectories(charDir);
-		logger.debug("data for "+name+" is stored in "+charDir);
-		BaseCharacterHandleLight handle = new BaseCharacterHandleLight(charDir, system);
-		handle.setName(name);
-		cache.add(handle);
-		logger.info("created handle "+handle);
-		return handle;
+			logger.debug("data for "+name+" is stored in "+charDir);
+			BaseCharacterHandleLight handle = new BaseCharacterHandleLight(charDir, system);
+			handle.setName(name);
+			cache.add(handle);
+			logger.info("created handle "+handle);
+			BabylonEventBus.fireEvent(BabylonEventType.CHAR_ADDED, handle);
+			return handle;
+		} else {
+			BaseCharacterHandleLight handle = (BaseCharacterHandleLight) getCharacter(system, name);
+			logger.warn("Trying to add an already existing character");
+			return handle;
+		}
 	}
 
 	//-------------------------------------------------------------------
@@ -448,6 +454,15 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 	}
 
 	//-------------------------------------------------------------------
+	public CharacterHandle getCharacter(RoleplayingSystem system, String name) {
+		for (CharacterHandle handle : getMyCharacters(system))  {
+			if (handle.getName().equalsIgnoreCase(name))
+				return handle;
+		}
+		return null;
+	}
+
+	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.character.CharacterProvider#getCharacters(de.rpgframework.core.Player, de.rpgframework.core.RoleplayingSystem)
 	 */
@@ -619,6 +634,7 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 		// Update index
 		serial.write(((BaseCharacterHandleLight)handle).getIndex(), new FileWriter(((BaseCharacterHandleLight)handle).getPath().resolve(INDEX).toFile()));
 		
+		BabylonEventBus.fireEvent(BabylonEventType.CHAR_MODIFIED, handle);
 		return attach;
 	}
 
