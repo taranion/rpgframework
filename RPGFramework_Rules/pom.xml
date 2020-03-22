@@ -10,9 +10,8 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>rpgframework-core</artifactId>
-
-	<name>RPGFramework Core</name>
+	<artifactId>rpgframework-rules</artifactId>
+	<name>RPGFramework_Rules</name>
 	<url>http://www.rpgframework.de/</url>
 	<description>Base Framework</description>
 
@@ -49,4 +48,5 @@
 			</plugin>
 		</plugins>
 	</build>
+
 </project>

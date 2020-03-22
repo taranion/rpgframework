@@ -5,7 +5,7 @@
 
 	<groupId>de.rpgframework</groupId>
 	<artifactId>rpgframework-master</artifactId>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>5.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>RPGFramework</name>
@@ -19,10 +19,7 @@
 	</licenses>
 
 	<modules>
-		<module>RPGFramework_Core</module>
-		<module>RPGFramework_Chars</module>
-		<module>RPGFramework_JavaFX</module>
-		<module>RPGFramework_Products</module>
+		<module>RPGFramework_Reality</module>
 	</modules>
 
 	<developers>
@@ -42,8 +39,8 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.skip.deploy>false</maven.skip.deploy>
-		<openjfx.version>14-ea+7</openjfx.version>
-		<revision>4.0.0-SNAPSHOT</revision>
+		<openjfx.version>14</openjfx.version>
+		<revision>5.0.0-SNAPSHOT</revision>
 	</properties>
 
 	<dependencyManagement>
@@ -62,23 +59,23 @@
 			<dependency>
 				<groupId>de.rpgframework</groupId>
 				<artifactId>rpgframework-core</artifactId>
-				<version>4.0.0-SNAPSHOT</version>
+				<version>5.0.0-SNAPSHOT</version>
 			</dependency>
-			<dependency>
-				<groupId>de.rpgframework</groupId>
-				<artifactId>rpgframework-chars</artifactId>
-				<version>${revision}</version>
-			</dependency>
-			<dependency>
-				<groupId>de.rpgframework</groupId>
-				<artifactId>rpgframework-products</artifactId>
-				<version>${revision}</version>
-			</dependency>
-			<dependency>
-				<groupId>de.rpgframework</groupId>
-				<artifactId>rpgframework-javafx</artifactId>
-				<version>${revision}</version>
-			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>de.rpgframework</groupId> -->
+<!-- 				<artifactId>rpgframework-chars</artifactId> -->
+<!-- 				<version>${revision}</version> -->
+<!-- 			</dependency> -->
+<!-- 			<dependency> -->
+<!-- 				<groupId>de.rpgframework</groupId> -->
+<!-- 				<artifactId>rpgframework-products</artifactId> -->
+<!-- 				<version>${revision}</version> -->
+<!-- 			</dependency> -->
+<!-- 			<dependency> -->
+<!-- 				<groupId>de.rpgframework</groupId> -->
+<!-- 				<artifactId>rpgframework-javafx</artifactId> -->
+<!-- 				<version>${revision}</version> -->
+<!-- 			</dependency> -->
 			<dependency>
 				<groupId>org.openjfx</groupId>
 				<artifactId>javafx-base</artifactId>
@@ -107,12 +104,12 @@
 			<dependency>
 				<groupId>org.prelle</groupId>
 				<artifactId>javafx-extensions</artifactId>
-				<version>4.0.6</version>
+				<version>4.0.7</version>
 			</dependency>
 			<dependency>
 				<groupId>org.prelle</groupId>
 				<artifactId>simple-persist</artifactId>
-				<version>3.0.1</version>
+				<version>[3.1.3,3.99)</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
