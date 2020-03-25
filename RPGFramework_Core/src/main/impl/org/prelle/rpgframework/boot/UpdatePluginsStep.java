@@ -325,6 +325,12 @@ public class UpdatePluginsStep implements BootStep {
 			if (newest!=null && isNewer(newest, local)) {
 				logger.debug("Update "+local+" with "+newest);
 				newest.localToUpdate = local;
+				try {
+					Files.deleteIfExists(local.localFile);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				ret.add(newest);
 			} else {
 				logger.debug("No update found for "+local);

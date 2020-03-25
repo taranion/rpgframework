@@ -65,9 +65,10 @@ public class PluginRegistryImpl implements PluginRegistry {
 				logger.info("Deleting outdated plugins");
 				for (PluginDescriptor desc : toDelete) {
 					try {
+						logger.info("Should delete "+desc);
 						Files.deleteIfExists(desc.localFile);
-					} catch (IOException e) {
-						logger.error("Failed deleting "+desc.localFile);
+					} catch (Exception e) {
+						logger.error("Failed deleting "+desc+" : "+e);
 					}
 				}
 			}
