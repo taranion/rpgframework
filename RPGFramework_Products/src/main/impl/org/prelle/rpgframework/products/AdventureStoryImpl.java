@@ -102,8 +102,10 @@ public class AdventureStoryImpl implements AdventureStory {
 	 */
 	@Override
 	public String getTitle(Locale lang) {
+		if (lang==null)
+			throw new NullPointerException("Locale may not be null");
 		for (LocalizedAdventureContent tmp : content) {
-			if (tmp.getLocale().getDisplayLanguage().equals(lang.getDisplayLanguage()))
+			if (tmp.getLocale()!=null && tmp.getLocale().getDisplayLanguage().equals(lang.getDisplayLanguage()))
 					return tmp.getTitle();
 		}
 		return null;
