@@ -10,5 +10,6 @@ module de.rpgframework.products {
 	requires simple.persist;
 	requires org.apache.logging.log4j;
 	requires java.xml;
+	requires jdk.zipfs;
 
 }
