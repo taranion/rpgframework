@@ -15,7 +15,8 @@ public enum PrintType {
 	PDF,
 	IMAGE,
 	HTML,
-	BBCODE
+	BBCODE,
+	JSON
 	;
 	
 	//--------------------------------------------------------------------
