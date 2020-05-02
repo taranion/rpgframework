@@ -1,6 +1,7 @@
 module de.rpgframework.chars {
 	exports de.rpgframework.character;
 	exports de.rpgframework.print;
+	exports de.rpgframework.genericrpg.data;
 
 	uses de.rpgframework.character.RulePlugin;
 	requires transitive de.rpgframework.core;
