@@ -3,9 +3,6 @@ package de.rpgframework.character.impl;
 import java.util.Date;
 
 import de.rpgframework.character.Attachment;
-import de.rpgframework.character.CharacterHandle;
-import de.rpgframework.character.CharacterHandle.Format;
-import de.rpgframework.character.CharacterHandle.Type;
 
 /**
  * This class stores a specific kind of data associated with a character.
@@ -31,7 +28,6 @@ public class AttachmentImpl implements Comparable<Attachment>, Attachment {
 		this.filename = filename;
 	}
 	
-	//-------------------------------------------------------------------
 	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.character.Attachment#getType()

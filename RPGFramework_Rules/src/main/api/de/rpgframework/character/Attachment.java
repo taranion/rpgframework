@@ -2,10 +2,24 @@ package de.rpgframework.character;
 
 import java.util.Date;
 
-import de.rpgframework.character.CharacterHandle.Format;
-import de.rpgframework.character.CharacterHandle.Type;
-
 public interface Attachment {
+	
+	public enum Format {
+		RULESPECIFIC,
+		RULESPECIFIC_EXTERNAL,
+		HTML,
+		TEXT,
+		PDF,
+		JSON,
+		BBCODE,
+		IMAGE
+	}
+	
+	public enum Type {
+		CHARACTER,
+		BACKGROUND,
+		REPORT,
+	}
 
 	//-------------------------------------------------------------------
 	public Type getType();
