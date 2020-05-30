@@ -247,6 +247,7 @@ public class LoadRulePluginsBootStep implements BootStep {
 						callback.message("Initialize "+plugin.getClass().getSimpleName());
 					double percBefore = ((double)successful.size()) / ((double)acceptedRulePlugins.size());
 					final double percent = ((double)successful.size()+1) / ((double)acceptedRulePlugins.size());
+					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
 					plugin.init( (perc) -> {
 						if (callback!=null) {
 							double relPerc = ((percent-percBefore) * perc) + percBefore;
@@ -254,7 +255,6 @@ public class LoadRulePluginsBootStep implements BootStep {
 							callback.progressChanged(relPerc);
 						}
 					});
-					plugin.attachConfigurationTree(RPGFrameworkLoader.getInstance().getPluginConfigurationNode());
 					changed = true;
 					successful.add(plugin);
 					double perc2 = ((double)successful.size()) / ((double)rulePlugins.size());
