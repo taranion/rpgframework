@@ -8,6 +8,7 @@ module de.rpgframework.chars {
 	
 	requires org.apache.logging.log4j;
 	requires simple.persist;
+	requires java.desktop;
 	
 	provides de.rpgframework.RPGFrameworkPlugin with org.prelle.rpgframework.character.PluginRoleplayingSystems;
 

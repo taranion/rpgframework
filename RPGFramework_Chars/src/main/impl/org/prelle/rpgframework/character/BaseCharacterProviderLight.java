@@ -632,7 +632,11 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 		
 		logger.info("Filename of added attachment: "+attach.getFilename());
 		// Update index
-		serial.write(((BaseCharacterHandleLight)handle).getIndex(), new FileWriter(((BaseCharacterHandleLight)handle).getPath().resolve(INDEX).toFile()));
+		try {
+			serial.write(((BaseCharacterHandleLight)handle).getIndex(), new FileWriter(((BaseCharacterHandleLight)handle).getPath().resolve(INDEX).toFile()));
+		} catch (Exception e) {
+			logger.error("Failed creating "+INDEX,e);
+		}
 		
 		BabylonEventBus.fireEvent(BabylonEventType.CHAR_MODIFIED, handle);
 		return attach;
