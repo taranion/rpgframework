@@ -1,10 +1,8 @@
 package de.rpgframework.print;
 
-import de.rpgframework.character.RuleSpecificCharacterObject;
-
-import java.awt.Color;
 import java.util.List;
-import java.util.Optional;
+
+import de.rpgframework.character.RuleSpecificCharacterObject;
 
 /**
  * @author Stefan
@@ -37,7 +35,6 @@ public interface PDFPrintElement {
         private int horizontalGrowthOffset = 0;
         private int index = 0;
         private int filterOption = 0;
-        private Optional<Color> backgroundColor = Optional.empty();
 
         public RenderingParameter() {
             this.orientation = Orientation.STANDALONE;
@@ -97,21 +94,6 @@ public interface PDFPrintElement {
             this.filterOption = filterOption;
         }
 
-		//-------------------------------------------------------------------
-		/**
-		 * @return the backgroundColor
-		 */
-		public Optional<Color> getBackgroundColor() {
-			return backgroundColor;
-		}
-
-		//-------------------------------------------------------------------
-		/**
-		 * @param backgroundColor the backgroundColor to set
-		 */
-		public void setBackgroundColor(Color backgroundColor) {
-			this.backgroundColor = Optional.of(backgroundColor);
-		}
     }
 
     enum Orientation{
