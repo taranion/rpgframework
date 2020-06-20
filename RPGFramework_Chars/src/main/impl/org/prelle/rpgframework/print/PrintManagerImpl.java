@@ -192,9 +192,10 @@ public class PrintManagerImpl implements PrintManager {
 		assert system!=null;
 		Path templateDir = customDir.resolve(system.name().toLowerCase());
 		Path imgFile = templateDir.resolve(file.getFileName());
-		logger.info("Add new background image "+imgFile);
+		logger.info("Copy "+file+" as new background image "+imgFile);
 
 		try {
+			Files.createDirectories(imgFile);
 			Files.copy(file, imgFile, StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error("Failed writing/replacing file "+imgFile+" with "+file,e);

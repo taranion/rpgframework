@@ -13,5 +13,6 @@ module de.rpgframework.chars {
 	provides de.rpgframework.RPGFrameworkPlugin with org.prelle.rpgframework.character.PluginRoleplayingSystems;
 
 	opens org.prelle.rpgframework.character to simple.persist;
+	opens org.prelle.rpgframework.print to simple.persist;
 	
 }

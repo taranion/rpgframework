@@ -27,7 +27,7 @@ import de.rpgframework.print.PrintLine;
 //@ElementList(entry="linedef",type=PrintLineImpl.class)
 public class PageDefinitionImpl implements PageDefinition {
 
-	private final static Logger logger = LogManager.getLogger("babylon.print");
+	private final static Logger logger = LogManager.getLogger("rpgframework.chars");
 
 	@Attribute
 	private int columns;
