@@ -19,6 +19,8 @@ public interface CustomDataHandler {
 		public PropertyResourceBundle helpProperties;
 	}
 	
+	public Path getCustomDataPath(RoleplayingSystem rules);
+	
 	public List<String> getAvailableCustomIDs(RoleplayingSystem rules);
 	
 	public CustomDataPackage getCustomData(RoleplayingSystem rules, String identifier);

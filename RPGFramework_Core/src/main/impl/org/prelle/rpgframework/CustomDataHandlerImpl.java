@@ -121,4 +121,13 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		return ret;
 	}
 
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.core.CustomDataHandler#getCustomDataPath(de.rpgframework.core.RoleplayingSystem)
+	 */
+	@Override
+	public Path getCustomDataPath(RoleplayingSystem rules) {
+		return localBaseDir.resolve(rules.name().toLowerCase());
+	}
+
 }
