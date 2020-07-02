@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListCell;
@@ -69,7 +70,6 @@ public class SelectionControllerNode<T extends SelectableItem, V extends Selecte
 		setSkin(new SelectionControlTwoColumnSkin<>(this));
 		getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 		
-		
 		this.control.addListener( (ov,o,n) -> refresh());
 		refresh();
 	}
@@ -81,21 +81,25 @@ public class SelectionControllerNode<T extends SelectableItem, V extends Selecte
 
 	//-------------------------------------------------------------------
 	public void refresh() {
-		availableProperty.get().clear();
-		availableProperty.get().addAll(control.get().getAvailable());
-		selectedProperty.get().clear();
-		selectedProperty.get().addAll(control.get().getSelected());
+		System.out.println("SelectionControllerNode.refresh: "+control.get().getSelected());
+		try {
+			availableProperty.get().setAll(control.get().getAvailable());
+			selectedProperty.get().setAll(control.get().getSelected());
+			System.out.println("SelectionControllerNode.refresh2: "+selectedProperty.get());
+		} finally {
+			System.out.println("SelectionControllerNode.refresh: done");
+		}
 	}
 	
 	//-------------------------------------------------------------------
 	public ObjectProperty<ObservableList<T>> availableProperty() { return availableProperty; }
 	public ObservableList<T> getAvailable() { return availableProperty.get(); }
-	public void setAvailable(ObservableList<T> value) { availableProperty.setValue(value); }
+//	public void setAvailable(ObservableList<T> value) { availableProperty.setValue(value); }
 	
 	//-------------------------------------------------------------------
 	public ObjectProperty<ObservableList<V>> selectedProperty() { return selectedProperty; }
 	public ObservableList<V> getSelected() { return selectedProperty.get(); }
-	public void setSelected(ObservableList<V> value) { selectedProperty.setValue(value); }
+//	public void setSelected(ObservableList<V> value) { selectedProperty.setValue(value); }
 	
 	//-------------------------------------------------------------------
 	public ObjectProperty<BiFunction<T, List<?>, ?>> optionCallbackProperty() { return optionCallbackProperty; }

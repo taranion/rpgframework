@@ -9,7 +9,6 @@ import de.rpgframework.genericrpg.SelectableItem;
 import de.rpgframework.genericrpg.SelectedValue;
 import de.rpgframework.genericrpg.SelectionController;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
@@ -73,9 +72,11 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
 		
 		listPossible = new ListView<T>();
 		listPossible.setCellFactory(cfAvailable);
+		listPossible.itemsProperty().bind(getSkinnable().availableProperty());
 		
 		listSelected = new ListView<V>();
 		listSelected.setCellFactory(cfSelected);
+		listSelected.itemsProperty().bind(getSkinnable().selectedProperty());
 		
 		lblAvailable = new Label(" "+getSkinnable().getAvailableHeading());
 		lblSelected  = new Label(" "+getSkinnable().getSelectedHeading());
@@ -111,16 +112,6 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
 
 	//-------------------------------------------------------------------
 	private void initInteractivity() {
-		getSkinnable().availableProperty().addListener( (ov,o,n) -> {listPossible.getItems().clear(); listPossible.getItems().addAll(n);});
-		getSkinnable().selectedProperty().addListener( (ov,o,n) -> {listSelected.getItems().clear(); listSelected.getItems().addAll(n);});
-		getSkinnable().getAvailable().addListener( new ListChangeListener<T>() {
-			public void onChanged(Change<? extends T> c) {
-				listPossible.getItems().clear(); listPossible.getItems().addAll(getSkinnable().getAvailable());
-			}});
-		getSkinnable().getSelected().addListener( new ListChangeListener<SelectedValue<T>>() {
-			public void onChanged(Change<? extends SelectedValue<T>> c) {
-				listSelected.getItems().clear(); listSelected.getItems().addAll(getSkinnable().getSelected());
-			}});
 	
 //		getSkinnable().availableCellFactoryProperty().addListener( (ov,o,n) -> listPossible.setCellFactory(n));
 //		getSkinnable().selectedCellFactoryProperty().addListener( (ov,o,n) -> listSelected.setCellFactory(n));
@@ -171,26 +162,39 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
     }
 
 	//-------------------------------------------------------------------
-	private void userSelects(T toSelect) {
-			SelectionController<T, V> ctrl = getSkinnable().getController();
-			if (ctrl.canBeSelected(toSelect)) {
-				// Is there a need for a selection
-				if (ctrl.needsOptionSelection(toSelect)) {
-					// Yes, user must choose
-					List<?> options = ctrl.getOptions(toSelect);
-					if (getSkinnable().getOptionCallback()!=null) {
-						Platform.runLater( () -> {
-							Object choice = getSkinnable().getOptionCallback().apply(toSelect, options);
-							if (choice!=null)
-								ctrl.select(toSelect, choice);
-						});
-					}
-				} else {
-					// No
-					ctrl.select(toSelect);
-				}
-			}
-	}
+    private void userSelects(T toSelect) {
+    	System.out.println("userSelects("+toSelect+")");
+    	SelectionController<T, V> ctrl = getSkinnable().getController();
+    	if (ctrl.canBeSelected(toSelect)) {
+    		// Is there a need for a selection
+    		if (ctrl.needsOptionSelection(toSelect)) {
+    			// Yes, user must choose
+    			List<?> options = ctrl.getOptions(toSelect);
+    		   	System.out.println("called getOptions");
+    			if (getSkinnable().getOptionCallback()!=null) {
+    				Platform.runLater( () -> {
+    	    		   	System.out.println("call getOptionCallback");
+    					Object choice = getSkinnable().getOptionCallback().apply(toSelect, options);
+    					if (choice!=null) {
+    		    		   	System.out.println("call select(option)");
+    						ctrl.select(toSelect, choice);
+    					}
+    				});
+    			}
+    		} else {
+    			// No
+    		   	System.out.println("call select before: "+getSkinnable().getSelected());
+    		   	V selected = ctrl.select(toSelect);
+       		   	System.out.println("call select after: "+getSkinnable().getSelected());
+    		   	if (selected!=null) {
+    		   		listSelected.getItems().add(selected);
+//    		   		listSelected.getItems().setAll(getSkinnable().getSelected());
+    		   	}
+    		}
+    	} else {
+    		System.out.println("can not be Selected("+toSelect+")");
+    	}
+    }
 
 	//-------------------------------------------------------------------
 	private void mouseClickedAvailable(ListCell<T> cell, MouseEvent ev) {
@@ -266,8 +270,20 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
 	private void dragOverSelected(DragEvent event) {
 		Node target = (Node) event.getSource();
 		if (event.getGestureSource() != target && event.getDragboard().hasString()) {
-            /* allow for both copying and moving, whatever user chooses */
-            event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            String enhanceID = event.getDragboard().getString();
+            // Find from available
+            T toSelect = null;
+            for (T tmp : getSkinnable().getController().getAvailable()) {
+            	String cmp = tmp.getTypeId()+":"+tmp.getId();
+            	if (enhanceID.equals(cmp)) {
+            		toSelect = tmp;
+            		break;
+            	}
+            }
+            if (toSelect!=null && getSkinnable().getController().canBeSelected(toSelect)) {
+            	/* allow for both copying and moving, whatever user chooses */
+            	event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            }
         }
 	}
 
@@ -325,6 +341,7 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
             }
             if (toSelect!=null) {
             	getSkinnable().getController().deselect(toSelect);
+            	getSkinnable().refresh();
             }
         }
         /* let the source know whether the string was successfully
@@ -333,5 +350,6 @@ public class SelectionControlTwoColumnSkin<T extends SelectableItem, V extends S
 
         event.consume();
 	}
+
 
 }
