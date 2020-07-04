@@ -18,13 +18,13 @@ import javafx.util.StringConverter;
  * @author Stefan Prelle
  *
  */
-public class HistoryElementSection extends SingleSection {
+public class HistoryElementSection extends ListSection<HistoryElement> {
 
 	private RoleplayingSystem rules;
 	private PropertyResourceBundle UI;
 	private ObjectProperty<StringConverter<Modification>> converter = new SimpleObjectProperty<>();
 	
-	protected ListView<HistoryElement> list;
+//	protected ListView<HistoryElement> list;
 
 	//-------------------------------------------------------------------
 	/**
@@ -33,32 +33,34 @@ public class HistoryElementSection extends SingleSection {
 	 * @param content
 	 */
 	public HistoryElementSection(ScreenManagerProvider provider, String title, PropertyResourceBundle UI, StringConverter<Modification> converter, RoleplayingSystem rules) {
-		super(provider, title, null);
+		super(title, provider, UI);
 		this.UI = UI;
 		this.converter.set( converter );
 		this.rules = rules;
-		initComponents();
-		initLayout();
+		list.setCellFactory(lv -> new HistoryElementListCell(UI, this.converter, rules));
+		setAddButton(null);
+//		initComponents();
+//		initLayout();
 		list.setStyle("-fx-min-width: 35em; -fx-pref-width: 50em; -fx-pref-height: 55em;");
 		list.setMaxHeight(Double.MAX_VALUE);
 	}
 	
-	//-------------------------------------------------------------------
-	private void initComponents() {
-		list = new ListView<HistoryElement>();
-		list.setCellFactory(lv -> new HistoryElementListCell(UI, converter, rules));
-	}
-	
-	//-------------------------------------------------------------------
-	private void initLayout() {
-		setContent(list);
-	}
-
-	//-------------------------------------------------------------------
-	public void setData(List<HistoryElement> data) {
-		list.getItems().setAll(data);
-		refresh();
-	}
+//	//-------------------------------------------------------------------
+//	private void initComponents() {
+//		list = new ListView<HistoryElement>();
+//		list.setCellFactory(lv -> new HistoryElementListCell(UI, converter, rules));
+//	}
+//	
+//	//-------------------------------------------------------------------
+//	private void initLayout() {
+//		setContent(list);
+//	}
+//
+//	//-------------------------------------------------------------------
+//	public void setData(List<HistoryElement> data) {
+//		list.getItems().setAll(data);
+//		refresh();
+//	}
 
 	//-------------------------------------------------------------------
 	/**
@@ -69,9 +71,19 @@ public class HistoryElementSection extends SingleSection {
 		list.refresh();
 	}
 
+//	//-------------------------------------------------------------------
+//	public ReadOnlyObjectProperty<HistoryElement> selectedProperty() {
+//		return list.getSelectionModel().selectedItemProperty();
+//	}
+
 	//-------------------------------------------------------------------
-	public ReadOnlyObjectProperty<HistoryElement> selectedProperty() {
-		return list.getSelectionModel().selectedItemProperty();
+	public void onAdd() {
+		
+	}
+
+	//-------------------------------------------------------------------
+	public void onDelete() {
+		
 	}
 
 }

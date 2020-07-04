@@ -87,7 +87,7 @@ public abstract class DevelopmentPage extends CharacterDocumentView {
 	}
 	//-------------------------------------------------------------------
 	private void initInteractivity() {
-		history.selectedProperty().addListener( (ov,o,n) -> {
+		history.showHelpForProperty().addListener( (ov,o,n) -> {
 			if (n!=null) {
 				HistoryElementBox box = new HistoryElementBox(n, UI, converter, rules);
 //				setDescriptionHeading(n.getName());
