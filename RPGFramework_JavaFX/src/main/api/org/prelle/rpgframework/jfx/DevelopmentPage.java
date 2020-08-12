@@ -15,6 +15,7 @@ import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.genericrpg.HistoryElement;
 import de.rpgframework.genericrpg.modification.Modification;
 import javafx.beans.property.BooleanProperty;
+import javafx.scene.control.Button;
 import javafx.util.StringConverter;
 
 /**
@@ -37,6 +38,7 @@ public abstract class DevelopmentPage extends CharacterDocumentView {
 	private RoleplayingSystem rules;
 	protected HistoryElementSection history;
 
+	private Button btnDel;
 	private AppBarButton btnAddExp;
 	private AppBarToggleButton cbAggregate;
 	private AppBarToggleButton btnSort;
@@ -65,6 +67,10 @@ public abstract class DevelopmentPage extends CharacterDocumentView {
 	private void initComponents() {
 		order = SortOrder.OLDEST_FIRST;
 		history = new HistoryElementSection(this, ResourceI18N.get(UI, "label.development"), UI, converter, rules);
+		
+		btnDel = new Button(null, new SymbolIcon("delete"));
+		btnDel.setDisable(true);
+		history.setDeleteButton(btnDel);
 
 		/*
 		 * Add Button for XP
