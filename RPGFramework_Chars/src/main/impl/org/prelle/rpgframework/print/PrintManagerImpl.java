@@ -96,21 +96,26 @@ public class PrintManagerImpl implements PrintManager {
 				String name = file.getFileName().toString();
 				name = name.substring(0, name.length()-4);
 				String xml = new String(Files.readAllBytes(file), "UTF-8");
-				PrintTemplateImpl template = marshaller.read(PrintTemplateImpl.class, xml);
-				template.setName(name);
-				if (template.getBackgroundImageFileName()!=null) {
-					Path imgFile = templateDir.resolve(template.getBackgroundImageFileName());
-					if (Files.exists(imgFile))
-						template.setBackgroundImage(imgFile);
-					else {
-						logger.error("Template file "+template+" references a non existing background image "+imgFile);
-						BabylonEventBus.fireEvent(BabylonEventType.UI_MESSAGE, 2,
-								ResourceI18N.format(RES,"error.printtemplate.nosuchbackground", name, imgFile.toString())
-								);
+				try {
+					PrintTemplateImpl template = marshaller.read(PrintTemplateImpl.class, xml);
+					template.setName(name);
+					if (template.getBackgroundImageFileName()!=null) {
+						Path imgFile = templateDir.resolve(template.getBackgroundImageFileName());
+						if (Files.exists(imgFile))
+							template.setBackgroundImage(imgFile);
+						else {
+							logger.error("Template file "+template+" references a non existing background image "+imgFile);
+							BabylonEventBus.fireEvent(BabylonEventType.UI_MESSAGE, 2,
+									ResourceI18N.format(RES,"error.printtemplate.nosuchbackground", name, imgFile.toString())
+									);
+						}
 					}
+					ret.add(template);
+					logger.info("Read template '"+name+"' from "+file);
+				} catch (Exception e) {
+					logger.error("Failed reading print template "+file,e);
+					BabylonEventBus.fireEvent(BabylonEventType.UI_MESSAGE, 1, "Cannot read print template "+file+"\n"+e);
 				}
-				ret.add(template);
-				logger.info("Read template '"+name+"' from "+file);
 			}
 		} catch (NoSuchFileException e) {
 			logger.debug("No print template for "+system+": "+e);
