@@ -3,6 +3,8 @@
  */
 package de.rpgframework.print;
 
+import java.util.Map;
+
 import de.rpgframework.print.impl.TemplateControllerImpl;
 
 /**
@@ -11,8 +13,8 @@ import de.rpgframework.print.impl.TemplateControllerImpl;
  */
 public class TemplateFactory {
 	
-	public static TemplateController newTemplateController(PrintTemplate template) {
-		return new TemplateControllerImpl(template);
+	public static TemplateController newTemplateController(PrintTemplate template, Map<String,PDFPrintElement> elementMap) {
+		return new TemplateControllerImpl(template, elementMap);
 	}
 
 }

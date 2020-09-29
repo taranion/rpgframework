@@ -29,6 +29,10 @@
 			<groupId>de.rpgframework</groupId>
 			<artifactId>rpgframework-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>de.rpgframework</groupId>
+			<artifactId>rpgframework-chars</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

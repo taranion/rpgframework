@@ -6,5 +6,6 @@ module de.rpgframework.print {
 	requires de.rpgframework.core;
 	requires simple.persist;
 	requires org.apache.logging.log4j;
+	requires de.rpgframework.chars;
 
 }

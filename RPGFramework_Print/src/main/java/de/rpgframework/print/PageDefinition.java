@@ -23,6 +23,12 @@ public class PageDefinition implements LayoutElement {
 
 	@ElementList(entry="component",type=PositionedComponent.class,inline=true)
 	private List<PositionedComponent> components;
+	
+	/** 
+	 * Marks which columns are occupied.
+	 * Recalculated on update
+	 */
+	private transient List<boolean[]> occupation = new ArrayList<boolean[]>();
 
 	//--------------------------------------------------------------------
 	public PageDefinition() {
@@ -64,6 +70,22 @@ public class PageDefinition implements LayoutElement {
 	@Override
 	public int getRequiredColumns() {
 		return columns;
+	}
+
+	//---------------------------------------------------------
+	/**
+	 * @return the occupation
+	 */
+	public List<boolean[]> getOccupation() {
+		return occupation;
+	}
+
+	//---------------------------------------------------------
+	/**
+	 * @param occupation the occupation to set
+	 */
+	public void setOccupation(List<boolean[]> occupation) {
+		this.occupation = occupation;
 	}
 
 //	//--------------------------------------------------------------------
