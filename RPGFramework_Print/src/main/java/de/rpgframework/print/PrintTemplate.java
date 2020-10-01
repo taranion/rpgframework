@@ -8,7 +8,7 @@ import org.prelle.simplepersist.Attribute;
 import org.prelle.simplepersist.ElementList;
 import org.prelle.simplepersist.Root;
 
-import de.rpgframework.print.PageDefinition;
+import de.rpgframework.print.impl.LayoutGridImpl;
 
 /**
  * @author Stefan
@@ -16,8 +16,8 @@ import de.rpgframework.print.PageDefinition;
  */
 @SuppressWarnings("serial")
 @Root(name="printtemplate")
-@ElementList(entry="page",type=PageDefinition.class)
-public class PrintTemplate extends ArrayList<PageDefinition> {
+@ElementList(entry="page",type=LayoutGridImpl.class)
+public class PrintTemplate extends ArrayList<LayoutGrid> {
 
 	@Attribute(name="bgfile")
 	private String bgfilename;
@@ -30,7 +30,7 @@ public class PrintTemplate extends ArrayList<PageDefinition> {
 	}
 
 	//--------------------------------------------------------------------
-	public PrintTemplate(List<PageDefinition> def) {
+	public PrintTemplate(List<LayoutGrid> def) {
 		super.addAll(def);
 	}
 
@@ -65,7 +65,7 @@ public class PrintTemplate extends ArrayList<PageDefinition> {
 	}
 
 	//--------------------------------------------------------------------
-	public void setPages(List<PageDefinition> items) {
+	public void setPages(List<LayoutGrid> items) {
 		clear();
 		this.addAll(items);
 	}

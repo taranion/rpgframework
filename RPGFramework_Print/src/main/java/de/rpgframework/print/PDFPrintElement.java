@@ -6,7 +6,9 @@ import java.util.List;
  * @author Stefan
  *
  */
-public interface PDFPrintElement extends LayoutElement {
+public interface PDFPrintElement {
+	
+	public int getRequiredColumns();
 
     byte[] render(RenderingParameter parameter);
 

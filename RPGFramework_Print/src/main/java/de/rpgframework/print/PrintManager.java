@@ -18,11 +18,7 @@ public interface PrintManager {
 
 	public void saveTemplate(RoleplayingSystem system, PrintTemplate value);
 
-	public PageDefinition createPageDefinition(int columns);
-
-//	public ElementCell createElementCell(PDFPrintElement value);
-
-	public PrintTemplate createTemplate(List<PageDefinition> items);
+	public PrintTemplate createTemplate(List<LayoutGrid> items);
 
 	public void addBackgroundImage(RoleplayingSystem system, Path file);
 

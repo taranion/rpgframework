@@ -71,6 +71,11 @@
 			</dependency>
 			<dependency>
 				<groupId>de.rpgframework</groupId>
+				<artifactId>rpgframework-print</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.rpgframework</groupId>
 				<artifactId>rpgframework-products</artifactId>
 				<version>${revision}</version>
 			</dependency>

@@ -27,7 +27,7 @@ import de.rpgframework.ResourceI18N;
 import de.rpgframework.core.BabylonEventBus;
 import de.rpgframework.core.BabylonEventType;
 import de.rpgframework.core.RoleplayingSystem;
-import de.rpgframework.print.PageDefinition;
+import de.rpgframework.print.LayoutGrid;
 import de.rpgframework.print.PrintManager;
 import de.rpgframework.print.PrintTemplate;
 
@@ -62,7 +62,7 @@ public class PrintManagerImpl implements PrintManager {
 		prepareConfigNode();
 
 		marshaller = new Persister();
-
+		
 		String dataDir = configRoot.getOption(RPGFramework.PROP_DATADIR).getStringValue();
 		customDir = FileSystems.getDefault().getPath(dataDir, DIRNAME_CUSTOM);
 
@@ -159,30 +159,12 @@ public class PrintManagerImpl implements PrintManager {
 		}
 	}
 
-//	//--------------------------------------------------------------------
-//	/**
-//	 * @see de.rpgframework.print.PrintManager#createElementCell(de.rpgframework.print.PDFPrintElement)
-//	 */
-//	@Override
-//	public ElementCell createElementCell(PDFPrintElement value) {
-//		return new ElementCellImpl(value);
-//	}
-
-	//--------------------------------------------------------------------
-	/**
-	 * @see de.rpgframework.print.PrintManager#createPageDefinition(int)
-	 */
-	@Override
-	public PageDefinition createPageDefinition(int columns) {
-		return new PageDefinition(columns);
-	}
-
 	//--------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.print.PrintManager#createTemplate(java.util.List)
 	 */
 	@Override
-	public PrintTemplate createTemplate(List<PageDefinition> items) {
+	public PrintTemplate createTemplate(List<LayoutGrid> items) {
 		return new PrintTemplate(items);
 	}
 

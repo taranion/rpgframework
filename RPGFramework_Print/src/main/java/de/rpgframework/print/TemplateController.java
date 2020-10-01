@@ -3,14 +3,25 @@
  */
 package de.rpgframework.print;
 
+import java.util.List;
+
 /**
  * @author Stefan Prelle
  *
  */
 public interface TemplateController {
 	
-	public void validate(PageDefinition page);
+	//---------------------------------------------------------
+	/**
+	 * @param page
+	 * @return List of found problems
+	 */
+	public List<String> validate(LayoutGrid page);
 	
-	public boolean canBeAdded(PageDefinition page, LayoutElement elem, int x, int y);
+	//---------------------------------------------------------
+	public boolean canBeAdded(LayoutGrid page, PDFPrintElement elem, int x, int y);
 
+	//---------------------------------------------------------
+	public void add(LayoutGrid page, PDFPrintElement elem, int x, int y);
+	
 }

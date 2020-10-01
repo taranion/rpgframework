@@ -116,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
 		for (Path jarPath : jarFiles) {
 			count++;
 			logger.debug("Opening JAR file: "+jarPath);
-			FileSystem jarFS = FileSystems.newFileSystem(jarPath, null);
+			FileSystem jarFS = FileSystems.newFileSystem(jarPath, (ClassLoader)null);
 			Path baseDir = jarFS.getPath("/");
 			loadData(baseDir, jarPath.toString());
 			percent = ((double)count) / (double)jarFiles.size();

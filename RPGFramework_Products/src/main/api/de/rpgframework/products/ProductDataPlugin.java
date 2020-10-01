@@ -64,7 +64,7 @@ public class ProductDataPlugin {
 			} else if (url.getProtocol().equals("file") && url.toString().endsWith(".jar")) {
 				logger.debug("Load product data from JAR file "+url.toExternalForm());
 				Path jarPath = Paths.get(url.toURI());
-				FileSystem jarFS = FileSystems.newFileSystem(jarPath, null);
+				FileSystem jarFS = FileSystems.newFileSystem(jarPath, (ClassLoader)null);
 				Path base = jarFS.getPath("/"+getClass().getPackage().getName().replace(".", "/"));
 				try {
 					url = new URL(url, getClass().getPackage().getName().replace(".", "/"));

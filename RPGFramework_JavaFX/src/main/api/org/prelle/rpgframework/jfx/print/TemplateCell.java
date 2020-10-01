@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Region;
 
 /**
@@ -29,10 +30,10 @@ public class TemplateCell extends Region {
 	private static PseudoClass IMPOSSIBLE_PSEUDO_CLASS = PseudoClass.getPseudoClass("impossible");
 
 	private int x,y;
-	private LayoutGrid grid;
+	private LayoutGridPane grid;
 	
 	//---------------------------------------------------------
-	public TemplateCell(int x, int y, LayoutGrid grid) {
+	public TemplateCell(int x, int y, LayoutGridPane grid) {
 		this.x    = x;
 		this.y    = y;
 		this.grid = grid;
@@ -44,7 +45,7 @@ public class TemplateCell extends Region {
 	}
 
 	//---------------------------------------------------------
-	public TemplateCell(int x, int y, LayoutGrid grid, ImageView node) {
+	public TemplateCell(int x, int y, LayoutGridPane grid, ImageView node) {
 		this(x,y, grid);
 		getChildren().add(node);
 		setEmpty(false);
@@ -117,7 +118,9 @@ public class TemplateCell extends Region {
 					String head = enhanceID.substring(0, pos);
 					String tail = enhanceID.substring(pos+1);
 					if (head.equals("element")) {
-						grid.dragOver(x,y, tail);
+						if (grid.dragOver(x,y, tail)) {
+							event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+						}
 					}
 				}
 
@@ -135,7 +138,6 @@ public class TemplateCell extends Region {
 		boolean success = false;
 		if (db.hasString()) {
 			String enhanceID = db.getString();
-			logger.debug("Dropped "+enhanceID);
 
 			int pos = enhanceID.indexOf(":");
 			if (pos>0) {
@@ -143,6 +145,7 @@ public class TemplateCell extends Region {
 				String tail = enhanceID.substring(pos+1);
 				if (head.equals("element")) {
 					grid.dragDropped(x, y, tail);
+					success = true;
 				}
 			}
 		}
