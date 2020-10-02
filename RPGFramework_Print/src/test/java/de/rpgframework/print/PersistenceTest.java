@@ -1,4 +1,4 @@
-package de.rpgframework.print2;
+package de.rpgframework.print;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,13 +15,6 @@ import org.prelle.simplepersist.Persister;
 import org.prelle.simplepersist.SerializationException;
 
 import de.rpgframework.character.RuleSpecificCharacterObject;
-import de.rpgframework.print.ElementCell;
-import de.rpgframework.print.LayoutGrid;
-import de.rpgframework.print.PDFPrintElement;
-import de.rpgframework.print.PDFPrintElementFeature;
-import de.rpgframework.print.PrintTemplate;
-import de.rpgframework.print.TemplateFactory;
-import de.rpgframework.print.PDFPrintElement.RenderingParameter;
 
 public class PersistenceTest {
 	
@@ -65,10 +58,7 @@ public class PersistenceTest {
 			}
 			
 			@Override
-			public String getId() {
-				// TODO Auto-generated method stub
-				return null;
-			}
+			public String getId() {return "Hallo"; }
 			
 			@Override
 			public List<String> getFilterOptions() {

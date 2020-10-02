@@ -9,6 +9,7 @@ import java.util.List;
 import org.prelle.simplepersist.Attribute;
 import org.prelle.simplepersist.ElementList;
 import org.prelle.simplepersist.ElementListUnion;
+import org.prelle.simplepersist.Root;
 
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
@@ -19,6 +20,7 @@ import de.rpgframework.print.PrintCell;
  * @author stefa
  *
  */
+@Root(name = "page")
 public class LayoutGridImpl implements LayoutGrid {
 
 	@Attribute
