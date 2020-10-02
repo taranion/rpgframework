@@ -22,6 +22,7 @@
 		<module>RPGFramework_Core</module>
 		<module>RPGFramework_Chars</module>
 		<module>RPGFramework_JavaFX</module>
+		<module>RPGFramework_Print</module>
 		<module>RPGFramework_Products</module>
 	</modules>
 
