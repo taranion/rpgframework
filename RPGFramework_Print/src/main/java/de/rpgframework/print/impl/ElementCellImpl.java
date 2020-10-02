@@ -76,4 +76,13 @@ public class ElementCellImpl extends PrintCellImpl implements PrintCell, Element
 		return options;
 	}
 
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.ElementCell#getElement()
+	 */
+	@Override
+	public PDFPrintElement getElement() {
+		return element;
+	}
+
 }

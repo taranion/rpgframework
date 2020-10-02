@@ -1,17 +1,21 @@
 package org.prelle.rpgframework.jfx.print;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import de.rpgframework.print.PDFPrintElement;
-import de.rpgframework.print.PDFPrintElement.RenderingParameter;
+import de.rpgframework.ResourceI18N;
+import de.rpgframework.character.RuleSpecificCharacterObject;
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
+import de.rpgframework.print.PDFPrintElement;
+import de.rpgframework.print.PDFPrintElement.RenderingParameter;
 import de.rpgframework.print.PrintCell;
 import de.rpgframework.print.TemplateController;
 import javafx.application.Platform;
@@ -20,8 +24,12 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 
@@ -30,16 +38,28 @@ import javafx.scene.layout.GridPane;
  *
  */
 public class LayoutGridPane extends GridPane {
-	
+
 	private final static Logger logger = LogManager.getLogger("rpgframework.javafx");
+	private final static ResourceBundle RES = ResourceBundle.getBundle(LayoutGridPane.class.getName());
 
 	private ObjectProperty<LayoutGrid> input;
 	private IntegerProperty colWidth;
 	private Map<String, PDFPrintElement> elementMap;
-	
+
 	private List<TemplateCell[]> lines = new ArrayList<TemplateCell[]>();
-	
+	private TemplateCell selected;
+	private RuleSpecificCharacterObject character;
+
 	private TemplateController control;
+	private ContextMenu context;
+	private MenuItem miDelete;
+	private MenuItem miOrient;
+	private MenuItem miGrowVert;
+	private MenuItem miShrinkVert;
+	private MenuItem miGrowHori;
+	private MenuItem miShrinkHori;
+	private MenuItem miFilter;
+	private MenuItem miPick;
 
 	//---------------------------------------------------------
 	public LayoutGridPane(LayoutGrid input, TemplateController ctrl, int colWidth, int gap, Map<String, PDFPrintElement> elementMap) {
@@ -49,13 +69,91 @@ public class LayoutGridPane extends GridPane {
 		this.elementMap = elementMap;
 		this.control  = ctrl;
 
+		initComponents();
 		setGridLinesVisible(true);
 		setVgap(gap);
 		setHgap(gap);
 		refreshColumns();
 		refreshCells();
+		initInteractivity();
+	}
+
+	//---------------------------------------------------------
+	private void initComponents() {
+		context = new ContextMenu();
+		miDelete = new MenuItem(ResourceI18N.get(RES, "context.delete"), null);
+		miOrient = new MenuItem(ResourceI18N.get(RES, "context.orientation"), null);
+		miGrowVert = new MenuItem(ResourceI18N.get(RES, "context.grow.vertical"), null);
+		miShrinkVert = new MenuItem(ResourceI18N.get(RES, "context.shrink.vertical"), null);
+		miGrowHori= new MenuItem(ResourceI18N.get(RES, "context.grow.horizontal"), null);
+		miShrinkHori = new MenuItem(ResourceI18N.get(RES, "context.shrink.horizontal"), null);
+	}
+
+	//---------------------------------------------------------
+	/**
+	 */
+	private void initInteractivity() {
 		setOnDragDone(ev -> logger.debug("Drag done"));
 		setOnDragDropped(ev -> logger.debug("Drag dropped"));
+		this.input.addListener( (ov,o,n) -> {
+			refreshColumns();
+			refreshCells();
+		});
+
+		miDelete.setOnAction(ev -> { 
+			control.delete(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
+		miPick.setOnAction(ev -> {
+			ElementCell cell = ((ElementCell)context.getUserData());
+			List<String> options = cell.getElement().getIndexableObjectNames(character);
+			logger.debug("List = "+options);
+
+			ContextMenu ctx = new ContextMenu();
+			ctx.setHideOnEscape(true);
+			int pos=-1;
+			for (String name : options) {
+				pos++;
+				MenuItem item = new MenuItem(name);
+				item.setUserData(pos);
+				item.setOnAction(ev2 -> {
+					ctx.hide();
+					int index = (Integer)((MenuItem)ev2.getSource()).getUserData();
+					logger.info("Selected list index "+index+" for component ");
+					cell.getSavedRenderOptions().setSelectedIndex(index);
+					update();
+					});
+				ctx.getItems().add(item);
+			}
+			ctx.setAutoHide(false);
+			ctx.show(context, context.getAnchorX()-1, context.getAnchorY()-1);
+		});
+		
+		miFilter.setOnAction(ev -> {
+			ElementCell cell = ((ElementCell)context.getUserData());
+			List<String> options = cell.getElement().getFilterOptions();
+			logger.debug("Filter options of "+cell.getElement().getClass().getSimpleName()+" = "+options);
+
+			ContextMenu ctx = new ContextMenu();
+			ctx.setHideOnEscape(true);
+			int pos=-1;
+			for (String name : options) {
+				pos++;
+				MenuItem item = new MenuItem(name);
+				item.setUserData(pos);
+				item.setOnAction(ev2 -> {
+					ctx.hide();
+					cell.getSavedRenderOptions().setVariantIndex(
+						(Integer)((MenuItem)ev2.getSource()).getUserData());
+					logger.debug("Picked display variant "+cell.getSavedRenderOptions().getVariantIndex()+" from "+options);
+					update();
+					});
+				ctx.getItems().add(item);
+			}
+			ctx.setAutoHide(false);
+			ctx.show(context, context.getAnchorX()-1, context.getAnchorY()-1);
+		});
+
 	}
 
 	//---------------------------------------------------------
@@ -72,6 +170,9 @@ public class LayoutGridPane extends GridPane {
 		TemplateCell[] line = new TemplateCell[input.get().getColumnCount()];
 		for (int i=0; i<line.length; i++) {
 			line[i] = new TemplateCell(i,lines.size(),this);
+			TemplateCell cell = line[i];
+			cell.setOnMouseClicked(ev -> mouseClicked(ev, cell));
+			this.add(line[i], i, lines.size());
 		}
 		lines.add(line);
 	}
@@ -81,16 +182,16 @@ public class LayoutGridPane extends GridPane {
 		logger.debug("refreshCells");
 		super.getChildren().clear();
 		lines.clear();
-		
+
 		for (PrintCell comp : input.get().getComponents()) {
 			int x = comp.getX();
 			int y = comp.getY();
-			
+
 			// Make sure lines exist
 			while (y>=lines.size()) {
 				addNewLine();
 			}
-						
+
 			switch (comp.getType()) {
 			case EMPTY:
 				break;
@@ -105,14 +206,21 @@ public class LayoutGridPane extends GridPane {
 				} else {
 					// Render component
 					Image img = new Image(new ByteArrayInputStream(item.render(param)));
+					logger.info("Width of "+cell.getElementId()+" is "+img.getWidth()+"x"+img.getHeight());
 					ImageView iview = new ImageView(img);
-					iview.setFitWidth(img.getWidth()*0.70);
-					iview.setPreserveRatio(true);
-					
-					super.add(iview, x,y, item.getRequiredColumns(),1);
-					for (int i=x; i<(x+item.getRequiredColumns()); i++) {
-						lines.get(y)[i] = null;
+					//					iview.setFitWidth(img.getWidth()*0.50);
+					//					iview.setPreserveRatio(true);
+					cell.setDisplay(iview);
+
+					lines.get(y)[x].setContent(cell);
+					GridPane.setColumnSpan(lines.get(y)[x], cell.getWidth());
+					for (int i=x+1; i<(x+cell.getWidth()); i++) {
+						lines.get(y)[i].setVisible(false);
 					}
+					//					super.add(iview, x,y, item.getRequiredColumns(),1);
+					//					for (int i=x; i<(x+item.getRequiredColumns()); i++) {
+					//						lines.get(y)[i] = null;
+					//					}
 				}
 				break;
 			case GRID:
@@ -122,19 +230,24 @@ public class LayoutGridPane extends GridPane {
 
 		}
 		addNewLine();
-		
-		// Now add remaining empty cells
-		for (int y=0; y<lines.size(); y++) {
-			for (int x=0; x<lines.get(y).length; x++) {
-				Node node = lines.get(y)[x]; 
-				logger.debug("Node at "+x+","+y+" = "+node);
-				if (node!=null) {
-					super.add(node, x,y);
-				}
-			}
-		}
+
+		//		// Now add remaining empty cells
+		//		for (int y=0; y<lines.size(); y++) {
+		//			for (int x=0; x<lines.get(y).length; x++) {
+		//				Node node = lines.get(y)[x]; 
+		//				//				logger.debug("Node at "+x+","+y+" = "+node);
+		//				if (node!=null) {
+		//					super.add(node, x,y);
+		//				}
+		//			}
+		//		}
 	}
-	
+
+	//---------------------------------------------------------
+	public void update() {
+		refreshCells();
+	}
+
 	//---------------------------------------------------------
 	private void clearCellStates() {
 		for (TemplateCell[] line : lines) {
@@ -151,7 +264,7 @@ public class LayoutGridPane extends GridPane {
 	public boolean dragOver(int x, int y, String reference) {
 		clearCellStates();
 		PDFPrintElement elem = elementMap.get(reference);
-//		logger.debug("Dragged "+reference+" at "+x+","+y);
+		//		logger.debug("Dragged "+reference+" at "+x+","+y);
 		if (elem!=null) {
 			boolean possible = control.canBeAdded(input.get(), elem, x, y);
 			if (y>=lines.size()) {
@@ -161,8 +274,10 @@ public class LayoutGridPane extends GridPane {
 			TemplateCell[] line = lines.get(y);
 			int max = Math.min(input.get().getColumnCount(), x+elem.getRequiredColumns());
 			for (int i=x; i<max; i++) {
-				line[i].setPossible(possible);
-				line[i].setImpossible(!possible);
+				if (line[i]!=null) {
+					line[i].setPossible(possible);
+					line[i].setImpossible(!possible);
+				}
 			}
 			return possible;
 		}
@@ -182,4 +297,55 @@ public class LayoutGridPane extends GridPane {
 		}
 	}
 
+	//---------------------------------------------------------
+	public ObjectProperty<LayoutGrid> inputProperty() { return input; }
+	public void setInput(LayoutGrid value) { input.set(value); }
+	public LayoutGrid getInput() { return input.get(); }
+
+	//--------------------------------------------------------------------
+	public void setBackgroundImage(File file) {
+		this.setStyle("-fx-background-size: cover; -fx-background-image: url(\"file:///"+file.getAbsolutePath().replace("\\", "/").replace(" ", "%20")+"\")");
+		logger.debug("Background style now: "+this.getStyle());
+	}
+
+	//---------------------------------------------------------
+	private void mouseClicked(MouseEvent event, TemplateCell templateCell) {
+		logger.info("mouseClicked "+event+"  secondary="+event.isSecondaryButtonDown());
+		if (event.getButton()==MouseButton.PRIMARY) {
+			logger.info("Select");
+			// Clear old selection
+			if (selected!=null)
+				selected.setSelected(false);
+			// Make new selection
+			if (templateCell!=null && templateCell.getContent()!=null) {
+				templateCell.setSelected(true);
+			}
+		} else
+		if (event.getButton()==MouseButton.SECONDARY) {
+			logger.info("SHow context");
+			PrintCell cell = templateCell.getContent();
+			context.getItems().clear();
+			context.getItems().addAll(miDelete);
+			if (control.canGrowVertical(getInput(), cell))
+				context.getItems().add(miGrowVert);
+			if (control.canGrowHorizontal(getInput(), cell))
+				context.getItems().add(miGrowHori);
+			if (control.canShrinkVertical(getInput(), cell))
+				context.getItems().add(miShrinkVert);
+			if (control.canShrinkHorizontal(getInput(), cell))
+				context.getItems().add(miShrinkHori);
+			
+			context.setUserData(templateCell);
+			context.show(LayoutGridPane.this.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+		}
+	}
+
+	//---------------------------------------------------------
+	/**
+	 * @param character the character to set
+	 */
+	public void setCharacter(RuleSpecificCharacterObject character) {
+		this.character = character;
+		refreshCells();
+	}
 }

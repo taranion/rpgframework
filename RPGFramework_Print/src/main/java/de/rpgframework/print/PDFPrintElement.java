@@ -2,6 +2,8 @@ package de.rpgframework.print;
 
 import java.util.List;
 
+import de.rpgframework.character.RuleSpecificCharacterObject;
+
 /**
  * @author Stefan
  *
@@ -16,7 +18,7 @@ public interface PDFPrintElement {
 
     boolean hasFeature(PDFPrintElementFeature feature);
 
-//    List<String> getIndexableObjectNames(RuleSpecificCharacterObject character);
+    List<String> getIndexableObjectNames(RuleSpecificCharacterObject character);
 
     List<String> getFilterOptions();
 

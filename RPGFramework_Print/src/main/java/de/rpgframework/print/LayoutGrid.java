@@ -18,5 +18,7 @@ public interface LayoutGrid {
 	public List<List<PrintCell>> getAsLines();
 	 
 	public ElementCell addComponent(int x, int y, PDFPrintElement elem);
+
+	public void deleteComponent(PrintCell cell);
 	
 }

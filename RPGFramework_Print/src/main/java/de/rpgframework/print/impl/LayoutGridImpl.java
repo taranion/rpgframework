@@ -109,4 +109,12 @@ public class LayoutGridImpl implements LayoutGrid {
 		return cell;
 	}
 
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.LayoutGrid#deleteComponent(de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public void deleteComponent(PrintCell cell) {
+		components.remove(cell);
+	}
 }

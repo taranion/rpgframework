@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.prelle.simplepersist.Persister;
 import org.prelle.simplepersist.SerializationException;
 
+import de.rpgframework.character.RuleSpecificCharacterObject;
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
 import de.rpgframework.print.PDFPrintElement;
@@ -77,6 +78,12 @@ public class PersistenceTest {
 			
 			@Override
 			public String getDescription() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public List<String> getIndexableObjectNames(RuleSpecificCharacterObject character) {
 				// TODO Auto-generated method stub
 				return null;
 			}

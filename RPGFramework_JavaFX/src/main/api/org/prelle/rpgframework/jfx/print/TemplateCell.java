@@ -6,6 +6,8 @@ package org.prelle.rpgframework.jfx.print;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.rpgframework.print.ElementCell;
+import de.rpgframework.print.PrintCell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
 import javafx.css.PseudoClass;
@@ -14,13 +16,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 /**
  * @author stefa
  *
  */
-public class TemplateCell extends Region {
+public class TemplateCell extends StackPane {
 	
 	private final static Logger logger = LogManager.getLogger("rpgframework.javafx");
 
@@ -31,6 +33,7 @@ public class TemplateCell extends Region {
 
 	private int x,y;
 	private LayoutGridPane grid;
+	private PrintCell content;
 	
 	//---------------------------------------------------------
 	public TemplateCell(int x, int y, LayoutGridPane grid) {
@@ -42,13 +45,6 @@ public class TemplateCell extends Region {
 		
 		setOnDragOver(ev -> dragOver(ev));
 		setOnDragDropped(ev -> dragDropped(ev));
-	}
-
-	//---------------------------------------------------------
-	public TemplateCell(int x, int y, LayoutGridPane grid, ImageView node) {
-		this(x,y, grid);
-		getChildren().add(node);
-		setEmpty(false);
 	}
 
 	/*************************************
@@ -156,4 +152,32 @@ public class TemplateCell extends Region {
 		event.consume();
 	}
 
+	//---------------------------------------------------------
+	/**
+	 * @param content
+	 */
+	public void setContent(PrintCell content) {
+		this.content = content;
+		
+		getChildren().clear();
+		if (content==null) {
+			setEmpty(true);
+			return;
+		}
+		switch (content.getType()) {
+		case EMPTY:
+			setEmpty(true);
+			break;
+		case ELEMENT:
+			setEmpty(false);
+			ImageView iView = (ImageView) ((ElementCell)content).getDisplay();
+			getChildren().add(iView);
+			break;
+		}
+	}
+	
+	//---------------------------------------------------------
+	public PrintCell getContent() {
+		return content;
+	}
 }
