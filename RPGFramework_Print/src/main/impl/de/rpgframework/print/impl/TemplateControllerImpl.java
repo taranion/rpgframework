@@ -268,23 +268,86 @@ public class TemplateControllerImpl implements TemplateController {
 	 */
 	@Override
 	public void growHorizontal(LayoutGrid page, PrintCell elem) {
-		// TODO Auto-generated method stub
 		ElementCell cell = (ElementCell)elem;
 		SavedRenderOptions opt = cell.getSavedRenderOptions();
 			logger.debug("  grow by "+cell.getElement().getNextHorizontalGrowth(cell.getSavedRenderOptions().getAsRenderingParameter())+" columns");
 		opt.setVerticalGrow(opt.getVerticalGrow()+1);
 	}
 
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#canShrinkHorizontal(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
 	@Override
 	public boolean canShrinkHorizontal(LayoutGrid page, PrintCell cell) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!(cell instanceof ElementCell))
+			return false;
+		
+		ElementCell eCell = (ElementCell)cell;
+		SavedRenderOptions opt = eCell.getSavedRenderOptions();
+		return opt.getHorizontalGrow()>0;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#shrinkHorizontal(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public void shrinkHorizontal(LayoutGrid page, PrintCell elem) {
+		ElementCell cell = (ElementCell)elem;
+		SavedRenderOptions opt = cell.getSavedRenderOptions();
+		logger.debug("  shrink horizontal");
+		opt.setHorizontalGrow(Math.max(0,opt.getHorizontalGrow()-1));
+	}
+	
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#canPick(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public boolean canPick(LayoutGrid page, PrintCell pcell) {
+		if (!(pcell instanceof ElementCell))
+			return false;
+		ElementCell cell = (ElementCell)pcell;
+		PDFPrintElement elem = cell.getElement();
+
+		if (!elem.hasFeature(PDFPrintElementFeature.INDEXABLE))
+			return false;
+
+		return true;
+	}
+	
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#canPick(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public boolean hasFilter(LayoutGrid page, PrintCell pcell) {
+		if (!(pcell instanceof ElementCell))
+			return false;
+		ElementCell cell = (ElementCell)pcell;
+		PDFPrintElement elem = cell.getElement();
+
+		if (!elem.hasFeature(PDFPrintElementFeature.FILTER))
+			return false;
+
+		return true;
 	}
 
 	@Override
-	public void shrinkHorizontal(LayoutGrid page, PrintCell elem) {
-		// TODO Auto-generated method stub
-		
+	public void setFilter(LayoutGrid page, ElementCell cell, int variant) {
+		logger.info("Select filter/variant "+variant+" for "+cell.getElement());
+		cell.getSavedRenderOptions().setVariantIndex(variant);
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#select(de.rpgframework.print.LayoutGrid, de.rpgframework.print.ElementCell, int)
+	 */
+	@Override
+	public void select(LayoutGrid page, ElementCell cell, int index) {
+		logger.info("Select index "+index+" for "+cell.getElement());
+		cell.getSavedRenderOptions().setSelectedIndex(index);		
 	}
 
 }

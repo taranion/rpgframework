@@ -58,4 +58,12 @@ public interface TemplateController {
 	public boolean canShrinkHorizontal(LayoutGrid page, PrintCell cell);
 	public void shrinkHorizontal(LayoutGrid page, PrintCell elem);
 	
+	//---------------------------------------------------------
+	public boolean hasFilter(LayoutGrid page, PrintCell cell);
+	public void setFilter(LayoutGrid page, ElementCell elem, int filter);
+	
+	//---------------------------------------------------------
+	public boolean canPick(LayoutGrid page, PrintCell cell);
+	public void select(LayoutGrid page, ElementCell elem, int index);
+	
 }

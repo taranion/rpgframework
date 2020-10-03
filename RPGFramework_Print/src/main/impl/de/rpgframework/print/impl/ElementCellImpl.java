@@ -51,11 +51,9 @@ public class ElementCellImpl extends PrintCellImpl implements PrintCell, Element
 	 */
 	@Override
 	public int getWidth() {
-		try {
-			return element.getRequiredColumns();
-		} catch (NullPointerException e) {
-			throw new NullPointerException("Cannot detect width of NULL column with ID "+elementReference);
-		}
+		if (element==null)
+			throw new IllegalStateException("ElementCell hasn't been resolved yet");
+		return element.getRequiredColumns();
 	}
 
 	//--------------------------------------------------------------------
@@ -83,6 +81,11 @@ public class ElementCellImpl extends PrintCellImpl implements PrintCell, Element
 	@Override
 	public PDFPrintElement getElement() {
 		return element;
+	}
+
+	//---------------------------------------------------------
+	public void setElement(PDFPrintElement elem) {
+		this.element = elem;
 	}
 
 }

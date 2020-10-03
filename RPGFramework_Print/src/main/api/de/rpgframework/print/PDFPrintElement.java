@@ -52,6 +52,9 @@ public interface PDFPrintElement {
         	StringBuffer buf = new StringBuffer();
         	buf.append("orient="+orientation);
         	buf.append(", hori="+horizontalGrowthOffset);
+        	buf.append(", vert="+verticalGrowthOffset);
+        	buf.append(", idx="+index);
+        	buf.append(", filter="+filterOption);
         	return buf.toString();
         }
 

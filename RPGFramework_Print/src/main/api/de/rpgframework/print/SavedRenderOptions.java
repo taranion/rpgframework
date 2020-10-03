@@ -53,7 +53,7 @@ public class SavedRenderOptions {
 
 	//--------------------------------------------------------------------
 	public String toString() {
-		return "orient="+orient+", vert="+verticalGrow+", hori="+horizontalGrow;
+		return "orient="+orient+", vert="+verticalGrow+", hori="+horizontalGrow+", index="+index+", filter="+variant;
 	}
 
 	//--------------------------------------------------------------------

@@ -5,6 +5,7 @@ package de.rpgframework.print.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.prelle.simplepersist.Attribute;
 import org.prelle.simplepersist.ElementList;
@@ -118,5 +119,36 @@ public class LayoutGridImpl implements LayoutGrid {
 	@Override
 	public void deleteComponent(PrintCell cell) {
 		components.remove(cell);
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.LayoutGrid#resolve(java.util.Map)
+	 */
+	@Override
+	public List<String> resolve(Map<String, PDFPrintElement> elementMap) {
+		List<String> errors = new ArrayList<String>();
+		for (PrintCell cell : new ArrayList<>(components)) {
+			switch (cell.getType()) {
+			case ELEMENT:
+				ElementCellImpl eCell = (ElementCellImpl)cell;
+				PDFPrintElement elem = elementMap.get(eCell.getElementId());
+				if (elem==null) {
+					errors.add("Unresolvable element id '"+eCell.getElementId()+"'");
+					components.remove(cell);
+				} else {
+					eCell.setElement(elem);
+				}
+				break;
+			case GRID:
+				MultiRowCellImpl mCell = (MultiRowCellImpl)cell;
+				errors.addAll(mCell.getGrid().resolve(elementMap));
+				break;
+			case EMPTY:
+				break;
+			}
+			
+		}
+		return errors;
 	}
 }

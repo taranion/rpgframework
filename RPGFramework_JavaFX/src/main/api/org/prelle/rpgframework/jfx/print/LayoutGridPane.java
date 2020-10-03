@@ -23,8 +23,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -59,7 +59,7 @@ public class LayoutGridPane extends GridPane {
 	private MenuItem miGrowHori;
 	private MenuItem miShrinkHori;
 	private MenuItem miFilter;
-	private MenuItem miPick;
+	private Menu miPick;
 
 	//---------------------------------------------------------
 	public LayoutGridPane(LayoutGrid input, TemplateController ctrl, int colWidth, int gap, Map<String, PDFPrintElement> elementMap) {
@@ -68,13 +68,16 @@ public class LayoutGridPane extends GridPane {
 		this.input    = new SimpleObjectProperty<LayoutGrid>(input);
 		this.elementMap = elementMap;
 		this.control  = ctrl;
-
+		setMinHeight(1644);
+		setMinWidth(1150);
+		
 		initComponents();
 		setGridLinesVisible(true);
 		setVgap(gap);
 		setHgap(gap);
 		refreshColumns();
 		refreshCells();
+		setStyle("-fx-background-color: #ffffff; -fx-padding: 20px; -fx-effect: dropshadow(one-pass-box, black, 10, 1.0, 3, 3)");
 		initInteractivity();
 	}
 
@@ -87,7 +90,7 @@ public class LayoutGridPane extends GridPane {
 		miShrinkVert = new MenuItem(ResourceI18N.get(RES, "context.shrink.vertical"), null);
 		miGrowHori= new MenuItem(ResourceI18N.get(RES, "context.grow.horizontal"), null);
 		miShrinkHori = new MenuItem(ResourceI18N.get(RES, "context.shrink.horizontal"), null);
-		miPick = new MenuItem(ResourceI18N.get(RES, "context.pick"), null);
+		miPick = new Menu(ResourceI18N.get(RES, "context.pick"), null);
 		miFilter = new MenuItem(ResourceI18N.get(RES, "context.filter"), null);
 	}
 
@@ -101,38 +104,46 @@ public class LayoutGridPane extends GridPane {
 			refreshColumns();
 			refreshCells();
 		});
-
+		this.heightProperty().addListener( (ov,o,n) -> {
+			logger.info("Size is now "+getWidth()+"x"+getHeight());
+		});
 		miDelete.setOnAction(ev -> { 
 			control.delete(getInput(), ((TemplateCell)context.getUserData()).getContent());
 			refreshCells();
 		});
-		miPick.setOnAction(ev -> {
-			ElementCell cell = ((ElementCell)context.getUserData());
-			List<String> options = cell.getElement().getIndexableObjectNames(character);
-			logger.debug("List = "+options);
-
-			ContextMenu ctx = new ContextMenu();
-			ctx.setHideOnEscape(true);
-			int pos=-1;
-			for (String name : options) {
-				pos++;
-				MenuItem item = new MenuItem(name);
-				item.setUserData(pos);
-				item.setOnAction(ev2 -> {
-					ctx.hide();
-					int index = (Integer)((MenuItem)ev2.getSource()).getUserData();
-					logger.info("Selected list index "+index+" for component ");
-					cell.getSavedRenderOptions().setSelectedIndex(index);
-					update();
-					});
-				ctx.getItems().add(item);
-			}
-			ctx.setAutoHide(false);
-			ctx.show(context, context.getAnchorX()-1, context.getAnchorY()-1);
-		});
+//		miPick.setOnAction(ev -> {
+//			logger.debug("Pick selected");
+//			TemplateCell tcell = ((TemplateCell)context.getUserData());
+//			ElementCell cell = (ElementCell)tcell.getContent();
+//			logger.debug("Get indices from "+cell.getElement());
+//			List<String> options = cell.getElement().getIndexableObjectNames(character);
+//			logger.debug("List = "+options);
+//
+//			ContextMenu ctx = new ContextMenu();
+//			ctx.setHideOnEscape(true);
+//			int pos=-1;
+//			for (String name : options) {
+//				pos++;
+//				MenuItem item = new MenuItem(name);
+//				item.setUserData(pos);
+//				item.setOnAction(ev2 -> {
+//					ctx.hide();
+//					int index = (Integer)((MenuItem)ev2.getSource()).getUserData();
+//					logger.info("Selected list index "+index+" for component ");
+//					cell.getSavedRenderOptions().setSelectedIndex(index);
+//					update();
+//					});
+//				ctx.getItems().add(item);
+//			}
+//			ctx.setAutoHide(false);
+//			logger.info("show "+context.getAnchorX()+","+context.getAnchorY());
+//			ctx.show(context, context.getAnchorX()-1, context.getAnchorY()-1);
+//		});
 		
 		miFilter.setOnAction(ev -> {
-			ElementCell cell = ((ElementCell)context.getUserData());
+			logger.debug("filter selected");
+			TemplateCell tcell = ((TemplateCell)context.getUserData());
+			ElementCell cell = (ElementCell)tcell.getContent();
 			List<String> options = cell.getElement().getFilterOptions();
 			logger.debug("Filter options of "+cell.getElement().getClass().getSimpleName()+" = "+options);
 
@@ -164,7 +175,8 @@ public class LayoutGridPane extends GridPane {
 		for (int i=0; i<input.get().getColumnCount(); i++) {
 			ColumnConstraints con = new ColumnConstraints(colWidth.get());
 			super.getColumnConstraints().add(con);
-		}		
+		}
+		logger.info("refreshColumns: "+input.get().getColumnCount()+" columns a "+colWidth.get()+" size");
 	}
 
 	//---------------------------------------------------------
@@ -207,6 +219,8 @@ public class LayoutGridPane extends GridPane {
 
 				} else {
 					// Render component
+					logger.debug("  saved "+cell.getSavedRenderOptions());
+					logger.debug("  render "+cell.getElementId()+" with parameter "+param);
 					Image img = new Image(new ByteArrayInputStream(item.render(param)));
 					logger.info("Width of "+cell.getElementId()+" is "+img.getWidth()+"x"+img.getHeight());
 					ImageView iview = new ImageView(img);
@@ -336,6 +350,30 @@ public class LayoutGridPane extends GridPane {
 				context.getItems().add(miShrinkVert);
 			if (control.canShrinkHorizontal(getInput(), cell))
 				context.getItems().add(miShrinkHori);
+			if (control.hasFilter(getInput(), cell))
+				context.getItems().add(miFilter);
+			if (control.canPick(getInput(), cell)) {
+				context.getItems().add(miPick);
+				//
+				ElementCell cell2 = (ElementCell)cell;
+				logger.debug("Get indices from "+cell2.getElement());
+				List<String> options = cell2.getElement().getIndexableObjectNames(character);
+				int pos=-1;
+				for (String name : options) {
+					pos++;
+					MenuItem item = new MenuItem(name);
+					item.setUserData(pos);
+					item.setOnAction(ev2 -> {
+						context.hide();
+						int index = (Integer)((MenuItem)ev2.getSource()).getUserData();
+						logger.info("Selected list index "+index+" for component "+cell2.getElement()+" = "+options.get(index));
+						cell2.getSavedRenderOptions().setSelectedIndex(index);
+						control.select(getInput(), cell2, index);
+						update();
+						});
+					miPick.getItems().add(item);
+				}
+			}
 			
 			context.setUserData(templateCell);
 			context.show(LayoutGridPane.this.getScene().getWindow(), event.getScreenX(), event.getScreenY());
