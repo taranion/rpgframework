@@ -88,6 +88,7 @@ public class LayoutGridPane extends GridPane {
 		miGrowHori= new MenuItem(ResourceI18N.get(RES, "context.grow.horizontal"), null);
 		miShrinkHori = new MenuItem(ResourceI18N.get(RES, "context.shrink.horizontal"), null);
 		miPick = new MenuItem(ResourceI18N.get(RES, "context.pick"), null);
+		miFilter = new MenuItem(ResourceI18N.get(RES, "context.filter"), null);
 	}
 
 	//---------------------------------------------------------
