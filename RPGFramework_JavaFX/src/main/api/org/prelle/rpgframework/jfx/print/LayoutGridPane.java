@@ -111,6 +111,22 @@ public class LayoutGridPane extends GridPane {
 			control.delete(getInput(), ((TemplateCell)context.getUserData()).getContent());
 			refreshCells();
 		});
+		miGrowHori.setOnAction(ev -> {
+			control.growHorizontal(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
+		miGrowVert.setOnAction(ev -> {
+			control.growVertical(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
+		miShrinkHori.setOnAction(ev -> {
+			control.shrinkHorizontal(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
+		miShrinkVert.setOnAction(ev -> {
+			control.shrinkVertical(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
 //		miPick.setOnAction(ev -> {
 //			logger.debug("Pick selected");
 //			TemplateCell tcell = ((TemplateCell)context.getUserData());
@@ -354,6 +370,7 @@ public class LayoutGridPane extends GridPane {
 				context.getItems().add(miFilter);
 			if (control.canPick(getInput(), cell)) {
 				context.getItems().add(miPick);
+				miPick.getItems().clear();
 				//
 				ElementCell cell2 = (ElementCell)cell;
 				logger.debug("Get indices from "+cell2.getElement());
