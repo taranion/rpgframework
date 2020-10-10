@@ -14,9 +14,14 @@ import org.prelle.simplepersist.Root;
 
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
+import de.rpgframework.print.MultiRowCell;
 import de.rpgframework.print.PDFPrintElement;
 import de.rpgframework.print.PrintCell;
 
+/**
+ * @author stefa
+ *
+ */
 /**
  * @author stefa
  *
@@ -108,6 +113,17 @@ public class LayoutGridImpl implements LayoutGrid {
 	@Override
 	public ElementCell addComponent(int x, int y, PDFPrintElement elem) {
 		ElementCellImpl cell = new ElementCellImpl(this, x, y, elem);
+		components.add(cell);
+		return cell;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.LayoutGrid#addGrid(int, int, int)
+	 */
+	@Override
+	public MultiRowCell addGrid(int x, int y, int width) {
+		MultiRowCellImpl cell = new MultiRowCellImpl(this, x, y, width);
 		components.add(cell);
 		return cell;
 	}

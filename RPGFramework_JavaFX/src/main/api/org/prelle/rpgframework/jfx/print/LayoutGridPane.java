@@ -127,34 +127,6 @@ public class LayoutGridPane extends GridPane {
 			control.shrinkVertical(getInput(), ((TemplateCell)context.getUserData()).getContent());
 			refreshCells();
 		});
-//		miPick.setOnAction(ev -> {
-//			logger.debug("Pick selected");
-//			TemplateCell tcell = ((TemplateCell)context.getUserData());
-//			ElementCell cell = (ElementCell)tcell.getContent();
-//			logger.debug("Get indices from "+cell.getElement());
-//			List<String> options = cell.getElement().getIndexableObjectNames(character);
-//			logger.debug("List = "+options);
-//
-//			ContextMenu ctx = new ContextMenu();
-//			ctx.setHideOnEscape(true);
-//			int pos=-1;
-//			for (String name : options) {
-//				pos++;
-//				MenuItem item = new MenuItem(name);
-//				item.setUserData(pos);
-//				item.setOnAction(ev2 -> {
-//					ctx.hide();
-//					int index = (Integer)((MenuItem)ev2.getSource()).getUserData();
-//					logger.info("Selected list index "+index+" for component ");
-//					cell.getSavedRenderOptions().setSelectedIndex(index);
-//					update();
-//					});
-//				ctx.getItems().add(item);
-//			}
-//			ctx.setAutoHide(false);
-//			logger.info("show "+context.getAnchorX()+","+context.getAnchorY());
-//			ctx.show(context, context.getAnchorX()-1, context.getAnchorY()-1);
-//		});
 		
 		miFilter.setOnAction(ev -> {
 			logger.debug("filter selected");
@@ -257,6 +229,7 @@ public class LayoutGridPane extends GridPane {
 				break;
 			case GRID:
 				logger.error("Not supported yet: "+comp.getType());
+				System.err.println("Not supported yet: "+comp.getType());
 				break;
 			}
 
@@ -295,6 +268,7 @@ public class LayoutGridPane extends GridPane {
 	//---------------------------------------------------------
 	public boolean dragOver(int x, int y, String reference) {
 		clearCellStates();
+//		logger.warn("dragOver("+x+","+y+","+reference+")");
 		PDFPrintElement elem = elementMap.get(reference);
 		//		logger.debug("Dragged "+reference+" at "+x+","+y);
 		if (elem!=null) {
@@ -312,7 +286,27 @@ public class LayoutGridPane extends GridPane {
 				}
 			}
 			return possible;
+		} else {
+			try {
+				int col = Integer.parseInt(reference);
+				boolean possible = control.canBeAddedGrid(input.get(), x, y, col);
+				if (y>=lines.size()) {
+					logger.error("Dragged over "+x+","+y+" but only have "+lines.size()+" rows");
+					return false;
+				}
+				TemplateCell[] line = lines.get(y);
+				int max = Math.min(input.get().getColumnCount(), x+col);
+				for (int i=x; i<max; i++) {
+					if (line[i]!=null) {
+						line[i].setPossible(possible);
+						line[i].setImpossible(!possible);
+					}
+				}
+				return possible;
+			} catch (NumberFormatException e) {
+			}
 		}
+		
 		return false;
 	}
 
@@ -320,12 +314,22 @@ public class LayoutGridPane extends GridPane {
 	public void dragDropped(int x, int y, String reference) {
 		clearCellStates();
 		PDFPrintElement elem = elementMap.get(reference);
-		logger.debug("Dropped "+reference+"/"+elem+" at "+x+","+y);
+		logger.info("Dropped "+reference+"/"+elem+" at "+x+","+y);
 		if (elem!=null) {
 			control.add(input.get(), elem, x, y);
 			Platform.runLater( () -> {
 				refreshCells();				
 			});
+		} else {
+			try {
+				int col = Integer.parseInt(reference);
+				control.add(getInput(),  x, y, col);
+				Platform.runLater( () -> {
+					refreshCells();				
+				});
+			} catch (NumberFormatException e) {	
+				logger.warn("No width",e);
+			}
 		}
 	}
 

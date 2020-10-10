@@ -117,6 +117,10 @@ public class TemplateCell extends StackPane {
 						if (grid.dragOver(x,y, tail)) {
 							event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 						}
+					} else if (head.equals("grid")) {
+						if (grid.dragOver(x,y, tail)) {
+							event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+						}
 					}
 				}
 
@@ -140,6 +144,9 @@ public class TemplateCell extends StackPane {
 				String head = enhanceID.substring(0, pos);
 				String tail = enhanceID.substring(pos+1);
 				if (head.equals("element")) {
+					grid.dragDropped(x, y, tail);
+					success = true;
+				} else if (head.equals("grid")) {
 					grid.dragDropped(x, y, tail);
 					success = true;
 				}

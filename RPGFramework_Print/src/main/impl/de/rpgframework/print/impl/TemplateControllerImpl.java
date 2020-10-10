@@ -15,6 +15,7 @@ import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.EmptyCell;
 import de.rpgframework.print.LayoutGrid;
+import de.rpgframework.print.MultiRowCell;
 import de.rpgframework.print.PDFPrintElement;
 import de.rpgframework.print.PDFPrintElementFeature;
 import de.rpgframework.print.PrintCell;
@@ -28,7 +29,7 @@ import de.rpgframework.print.TemplateController;
  *
  */
 public class TemplateControllerImpl implements TemplateController {
-	
+
 	private final static Logger logger = LogManager.getLogger("rpgframework.print");
 
 	private Map<String,PDFPrintElement> elementMap;
@@ -82,7 +83,7 @@ public class TemplateControllerImpl implements TemplateController {
 				}
 			}
 		}
-//		page.setOccupation(occupation);
+		//		page.setOccupation(occupation);
 		return errors;
 	}
 
@@ -92,18 +93,46 @@ public class TemplateControllerImpl implements TemplateController {
 	 */
 	@Override
 	public boolean canBeAdded(LayoutGrid page, PDFPrintElement elem, int x, int y) {
+		return canBeAddedGrid(page, x, y, elem.getRequiredColumns());
+		//		// Ensure x is a valid column
+		//		if (x<0) return false;
+		//		if (x>=page.getColumnCount()) return false;
+		//		// End column must also be valid
+		//		if ((x+elem.getRequiredColumns())>page.getColumnCount()) return false;
+		//		// After last line
+		//		if (page.getAsLines().size()>=y)
+		//			return true;
+		//
+		//		// Ensure all cells are not occupied
+		//		PrintCell[] line = PrintUtil.convertToArray(page)[y];
+		//		for (int i=x; i<(x+elem.getRequiredColumns()); i++) {
+		//			if (line[i]!=null && !(line[i] instanceof EmptyCell)) {
+		//				// Already occupied
+		//				return false;
+		//			}
+		//		}
+		//
+		//		return true;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#canBeAdded(de.rpgframework.print.LayoutGrid, de.rpgframework.print.LayoutElement, int, int)
+	 */
+	@Override
+	public boolean canBeAddedGrid(LayoutGrid page, int x, int y, int width) {
 		// Ensure x is a valid column
 		if (x<0) return false;
 		if (x>=page.getColumnCount()) return false;
 		// End column must also be valid
-		if ((x+elem.getRequiredColumns())>page.getColumnCount()) return false;
+		if ((x+width)>page.getColumnCount()) return false;
 		// After last line
 		if (page.getAsLines().size()>=y)
 			return true;
 
 		// Ensure all cells are not occupied
 		PrintCell[] line = PrintUtil.convertToArray(page)[y];
-		for (int i=x; i<(x+elem.getRequiredColumns()); i++) {
+		for (int i=x; i<(x+width); i++) {
 			if (line[i]!=null && !(line[i] instanceof EmptyCell)) {
 				// Already occupied
 				return false;
@@ -123,7 +152,7 @@ public class TemplateControllerImpl implements TemplateController {
 			logger.warn("Trying to add element at invalid position");
 			return;
 		}
-		
+
 		if (elem instanceof PDFPrintElement) {
 			ElementCell comp = page.addComponent(x, y, ((PDFPrintElement)elem));
 			comp.setDisplay(elem.render(comp.getSavedRenderOptions().getAsRenderingParameter()));
@@ -131,9 +160,20 @@ public class TemplateControllerImpl implements TemplateController {
 		} else {
 			logger.warn("ToDO: add "+elem.getClass());
 		}
-		
+
 	}
-	
+
+	@Override
+	public void add(LayoutGrid page, int x, int y, int width) {
+		if (!canBeAddedGrid(page, x, y, width)) {
+			logger.warn("Trying to add element at invalid position");
+			return;
+		}
+
+		MultiRowCell comp = page.addGrid(x, y, width);
+		logger.info("Added "+comp);
+	}
+
 	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.print.TemplateController#delete(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
@@ -172,7 +212,7 @@ public class TemplateControllerImpl implements TemplateController {
 	public boolean canBeDeleted(LayoutGrid page, PrintCell cell) {
 		if (cell==null)
 			return false;
-		
+
 		return page.getComponents().contains(cell);
 	}
 
@@ -193,7 +233,7 @@ public class TemplateControllerImpl implements TemplateController {
 	@Override
 	public void addBackgroundImage(PrintTemplate template, RoleplayingSystem system, Path path) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	//-------------------------------------------------------------------
@@ -204,7 +244,7 @@ public class TemplateControllerImpl implements TemplateController {
 	public boolean canGrowVertical(LayoutGrid page, PrintCell cell) {
 		if (!(cell instanceof ElementCell))
 			return false;
-		
+
 		ElementCell eCell = (ElementCell)cell;
 		PDFPrintElement elem = eCell.getElement();
 
@@ -234,7 +274,7 @@ public class TemplateControllerImpl implements TemplateController {
 	public boolean canShrinkVertical(LayoutGrid page, PrintCell cell) {
 		if (!(cell instanceof ElementCell))
 			return false;
-		
+
 		ElementCell eCell = (ElementCell)cell;
 		SavedRenderOptions opt = eCell.getSavedRenderOptions();
 		return opt.getVerticalGrow()>0;
@@ -270,7 +310,7 @@ public class TemplateControllerImpl implements TemplateController {
 	public void growHorizontal(LayoutGrid page, PrintCell elem) {
 		ElementCell cell = (ElementCell)elem;
 		SavedRenderOptions opt = cell.getSavedRenderOptions();
-			logger.debug("  grow by "+cell.getElement().getNextHorizontalGrowth(cell.getSavedRenderOptions().getAsRenderingParameter())+" columns");
+		logger.debug("  grow by "+cell.getElement().getNextHorizontalGrowth(cell.getSavedRenderOptions().getAsRenderingParameter())+" columns");
 		opt.setVerticalGrow(opt.getVerticalGrow()+1);
 	}
 
@@ -282,7 +322,7 @@ public class TemplateControllerImpl implements TemplateController {
 	public boolean canShrinkHorizontal(LayoutGrid page, PrintCell cell) {
 		if (!(cell instanceof ElementCell))
 			return false;
-		
+
 		ElementCell eCell = (ElementCell)cell;
 		SavedRenderOptions opt = eCell.getSavedRenderOptions();
 		return opt.getHorizontalGrow()>0;
@@ -299,7 +339,7 @@ public class TemplateControllerImpl implements TemplateController {
 		logger.debug("  shrink horizontal");
 		opt.setHorizontalGrow(Math.max(0,opt.getHorizontalGrow()-1));
 	}
-	
+
 	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.print.TemplateController#canPick(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
@@ -316,7 +356,7 @@ public class TemplateControllerImpl implements TemplateController {
 
 		return true;
 	}
-	
+
 	//-------------------------------------------------------------------
 	/**
 	 * @see de.rpgframework.print.TemplateController#canPick(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)

@@ -23,9 +23,11 @@ public interface TemplateController {
 	
 	//---------------------------------------------------------
 	public boolean canBeAdded(LayoutGrid page, PDFPrintElement elem, int x, int y);
+	public boolean canBeAddedGrid(LayoutGrid layoutGrid, int x, int y, int width);
 
 	//---------------------------------------------------------
 	public void add(LayoutGrid page, PDFPrintElement elem, int x, int y);
+	public void add(LayoutGrid page, int x, int y, int width);
 	
 	//---------------------------------------------------------
 	public boolean canBeDeleted(LayoutGrid page, PrintCell cell);

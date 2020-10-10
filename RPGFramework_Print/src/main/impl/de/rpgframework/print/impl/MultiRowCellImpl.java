@@ -17,7 +17,6 @@ import de.rpgframework.print.PrintCell;
  * @author Stefan
  *
  */
-@SuppressWarnings("serial")
 @Root(name="multirow")
 //@ElementListUnion({
 //    @ElementList(entry="empty", type=EmptyCellImpl.class),
@@ -34,7 +33,7 @@ public class MultiRowCellImpl extends PrintCellImpl implements MultiRowCell {
 	public MultiRowCellImpl(LayoutGrid parent, int x, int y, int width) {
 		super(parent,x,y);
 		this.width = width;
-		
+		super.type = Type.GRID;
 	}
 
 	//-------------------------------------------------------------------
