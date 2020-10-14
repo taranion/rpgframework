@@ -34,6 +34,7 @@ public class MultiRowCellImpl extends PrintCellImpl implements MultiRowCell {
 		super(parent,x,y);
 		this.width = width;
 		super.type = Type.GRID;
+		innerGrid = new LayoutGridImpl(width);
 	}
 
 	//-------------------------------------------------------------------

@@ -2,6 +2,7 @@ package org.prelle.rpgframework.jfx.print;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,16 @@ import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ResourceI18N;
 import de.rpgframework.character.RuleSpecificCharacterObject;
+import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
+import de.rpgframework.print.MultiRowCell;
 import de.rpgframework.print.PDFPrintElement;
 import de.rpgframework.print.PDFPrintElement.RenderingParameter;
 import de.rpgframework.print.PrintCell;
+import de.rpgframework.print.PrintTemplate;
 import de.rpgframework.print.TemplateController;
+import de.rpgframework.print.TemplateFactory;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -45,6 +50,7 @@ public class LayoutGridPane extends GridPane {
 	private ObjectProperty<LayoutGrid> input;
 	private IntegerProperty colWidth;
 	private Map<String, PDFPrintElement> elementMap;
+	private int gap;
 
 	private List<TemplateCell[]> lines = new ArrayList<TemplateCell[]>();
 	private TemplateCell selected;
@@ -64,6 +70,7 @@ public class LayoutGridPane extends GridPane {
 	//---------------------------------------------------------
 	public LayoutGridPane(LayoutGrid input, TemplateController ctrl, int colWidth, int gap, Map<String, PDFPrintElement> elementMap) {
 		getStyleClass().add("template-grid");
+		this.gap = gap;
 		this.colWidth = new SimpleIntegerProperty(colWidth);
 		this.input    = new SimpleObjectProperty<LayoutGrid>(input);
 		this.elementMap = elementMap;
@@ -230,6 +237,15 @@ public class LayoutGridPane extends GridPane {
 			case GRID:
 				logger.error("Not supported yet: "+comp.getType());
 				System.err.println("Not supported yet: "+comp.getType());
+				MultiRowCell grid = (MultiRowCell)comp;
+				LayoutGridPane gridPane = new LayoutGridPane(
+						grid.getInnerGrid(),
+						TemplateFactory.newTemplateController(grid.getInnerGrid(), elementMap), 
+						colWidth.get(),
+						gap,
+						elementMap);
+				grid.setDisplay(gridPane);
+				GridPane.setColumnSpan(lines.get(y)[x], grid.getWidth());
 				break;
 			}
 
