@@ -28,6 +28,7 @@ public abstract class SingleSection extends Section implements NodeWithTitle {
 	private ObjectProperty<Button> deleteButton = new SimpleObjectProperty<Button>();
 	private ObjectProperty<Button> addButton = new SimpleObjectProperty<Button>();
 	private ObjectProperty<Button> settingsButton = new SimpleObjectProperty<Button>();
+	private ObjectProperty<Button> otherButton = new SimpleObjectProperty<Button>();
 	protected ScreenManagerProvider managerProvider;
 	
 	//-------------------------------------------------------------------
@@ -35,6 +36,7 @@ public abstract class SingleSection extends Section implements NodeWithTitle {
 		deleteButton = new SimpleObjectProperty<Button>();
 		addButton = new SimpleObjectProperty<Button>();
 		settingsButton = new SimpleObjectProperty<Button>();
+		otherButton = new SimpleObjectProperty<Button>();
 		setSkin(new SingleSectionSkin(this));
 		this.managerProvider = provider;
 	}
@@ -72,6 +74,11 @@ public abstract class SingleSection extends Section implements NodeWithTitle {
 	public ObjectProperty<Button> settingsButtonProperty() { return settingsButton; }
 	public Button getSettingsButton() { return settingsButton.get(); }
 	public void setSettingsButton(Button value) { this.settingsButton.set(value); }
+
+	//-------------------------------------------------------------------
+	public ObjectProperty<Button> otherButtonProperty() { return otherButton; }
+	public Button getOtherButton() { return otherButton.get(); }
+	public void setOtherButton(Button value) { this.otherButton.set(value); }
 
 	//-------------------------------------------------------------------
 	public ScreenManagerProvider getManagerProvider() { return managerProvider; }

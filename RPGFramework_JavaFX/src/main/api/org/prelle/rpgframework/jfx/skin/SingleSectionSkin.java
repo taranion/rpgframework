@@ -74,6 +74,8 @@ public class SingleSectionSkin extends SkinBase<SingleSection> {
 			buttons.getChildren().add(getSkinnable().getDeleteButton());
 		if (getSkinnable().getAddButton()!=null)
 			buttons.getChildren().add(getSkinnable().getAddButton());
+		if (getSkinnable().getOtherButton()!=null)
+			buttons.getChildren().add(getSkinnable().getOtherButton());
 		
 		getChildren().add(bxContent);
 		VBox.setVgrow(bxContent, Priority.ALWAYS);
@@ -107,6 +109,13 @@ public class SingleSectionSkin extends SkinBase<SingleSection> {
 			}
 		});
 		getSkinnable().addButtonProperty().addListener( (ov,o,n) -> {
+			if (o!=null)
+				buttons.getChildren().remove(o);
+			if (n!=null) {
+				buttons.getChildren().add(n);
+			}
+		});
+		getSkinnable().otherButtonProperty().addListener( (ov,o,n) -> {
 			if (o!=null)
 				buttons.getChildren().remove(o);
 			if (n!=null) {
