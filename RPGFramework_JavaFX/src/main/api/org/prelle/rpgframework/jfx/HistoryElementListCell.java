@@ -10,6 +10,7 @@ import de.rpgframework.genericrpg.modification.Modification;
 import de.rpgframework.products.Adventure;
 import de.rpgframework.products.ProductService;
 import de.rpgframework.products.ProductServiceLoader;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -88,7 +89,13 @@ public class HistoryElementListCell extends ListCell<HistoryElement> {
 //
 //			TitledPane pane = new TitledPane(name, box);
 //			pane.setExpanded(false);
-			setGraphic(bxCollapsed);
+			if (Platform.isFxApplicationThread()) {
+				setGraphic(bxCollapsed);
+			} else {
+				Platform.runLater( () -> {
+					setGraphic(bxCollapsed);
+				});
+			}
 		}
 	}
 
