@@ -3,6 +3,7 @@ package org.prelle.rpgframework.jfx;
 import de.rpgframework.character.HardcopyPluginData;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -27,9 +28,13 @@ public class DescriptionPane extends VBox {
 		descrSubHead.setWrapText(true);
 		descrNode.setWrapText(true);
 
-		getChildren().addAll(descrHead, descrSubHead, descrNode);
+		ScrollPane scroll = new ScrollPane(descrNode);
+		scroll.setFitToWidth(true);
+		scroll.setMaxHeight(Double.MAX_VALUE);
+		scroll.setStyle("-fx-min-height: 30em");
+		getChildren().addAll(descrHead, descrSubHead, scroll);
 		getStyleClass().add("description-text");
-		VBox.setVgrow(descrNode, Priority.ALWAYS);
+		VBox.setVgrow(scroll, Priority.ALWAYS);
 		VBox.setMargin(descrSubHead, new Insets(0,0,20,0));
 	}
 
