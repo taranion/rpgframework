@@ -6,6 +6,8 @@ package org.prelle.rpgframework.jfx;
 import de.rpgframework.character.HardcopyPluginData;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
@@ -32,8 +34,12 @@ public class HelpTextPane extends VBox {
 		pageReference.getStyleClass().add("subtitle");
 		helpText.getStyleClass().add("body");
 		
-		getChildren().addAll(heading, pageReference, helpText);
-		VBox.setMargin(helpText, new Insets(20, 0, 0, 0));
+		ScrollPane scroll = new ScrollPane(helpText);
+		scroll.setFitToWidth(true);
+		scroll.setMaxHeight(Double.MAX_VALUE);
+		getChildren().addAll(heading, pageReference, scroll);
+		VBox.setVgrow(scroll, Priority.ALWAYS);
+		VBox.setMargin(scroll, new Insets(20, 0, 0, 0));
 	}
 
 	//-------------------------------------------------------------------
