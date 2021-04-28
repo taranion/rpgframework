@@ -40,6 +40,8 @@ public class HelpTextPane extends VBox {
 		getChildren().addAll(heading, pageReference, scroll);
 		VBox.setVgrow(scroll, Priority.ALWAYS);
 		VBox.setMargin(scroll, new Insets(20, 0, 0, 0));
+		setMaxHeight(Double.MAX_VALUE);
+//		setStyle("-fx-background-color: pink");
 	}
 
 	//-------------------------------------------------------------------
