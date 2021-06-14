@@ -110,7 +110,7 @@ public class RPGFrameworkImpl implements RPGFramework {
 
 		configRoot = new ConfigContainerImpl(PREF, "babylon");
 		cfgLanguage = configRoot.createOption(PROP_LANGUAGE, ConfigOption.Type.CHOICE, Locale.getDefault());
-		cfgLanguage.setOptions(Locale.GERMAN, Locale.ENGLISH);
+		cfgLanguage.setOptions(Locale.GERMAN, Locale.ENGLISH, Locale.FRENCH);
 		cfgLanguage.setValueConverter(new StringConverter<Locale>() {
 			public String toString(Locale val) { return val.getLanguage();}
 			public Locale fromString(String val) { return new Locale(val); }
