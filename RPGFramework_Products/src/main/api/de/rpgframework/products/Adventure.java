@@ -4,6 +4,8 @@
 package de.rpgframework.products;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
 
 import de.rpgframework.core.RoleplayingSystem;
 
@@ -45,5 +47,11 @@ public interface Adventure extends Comparable<Adventure> {
 	 * Shortcut for ProductService.getProductWith(this).get(0).getCover();
 	 */
 	public byte[] getCover();
+
+	//--------------------------------------------------------------------
+	public List<String> getLanguages();
+
+	//--------------------------------------------------------------------
+	public boolean supportsLanguage(Locale loc);
 
 }

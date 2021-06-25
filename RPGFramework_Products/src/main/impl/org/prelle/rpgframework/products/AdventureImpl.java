@@ -4,8 +4,10 @@
 package org.prelle.rpgframework.products;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.prelle.simplepersist.AttribConvert;
 import org.prelle.simplepersist.Attribute;
@@ -145,6 +147,40 @@ public class AdventureImpl implements Adventure {
 				return prod.getImage();
 		}
 		return null;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.products.Adventure#getLanguages()
+	 */
+	@Override
+	public List<String> getLanguages() {
+		List<String> ret = new ArrayList<>();
+		List<Product> products = ProductServiceLoader.getInstance().getProductWith(this);
+		if (products.isEmpty())
+			return null;
+		Collections.sort(products);
+		for (Product prod : products) {
+			ret.add(prod.getLanguage());
+		}
+		return ret;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.products.Adventure#supportsLanguage(java.util.Locale)
+	 */
+	@Override
+	public boolean supportsLanguage(Locale loc) {
+		List<Product> products = ProductServiceLoader.getInstance().getProductWith(this);
+		if (products.isEmpty())
+			return false;
+		Collections.sort(products);
+		for (Product prod : products) {
+			if (prod.getLanguage().equalsIgnoreCase(loc.getLanguage()))
+				return true;
+		}
+		return false;
 	}
 
 }
