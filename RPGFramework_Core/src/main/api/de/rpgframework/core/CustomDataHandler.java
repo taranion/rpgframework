@@ -24,5 +24,7 @@ public interface CustomDataHandler {
 	public List<String> getAvailableCustomIDs(RoleplayingSystem rules);
 	
 	public CustomDataPackage getCustomData(RoleplayingSystem rules, String identifier);
-	
+
+	public void setCustomText(RoleplayingSystem rules, String key, String value);
+
 }

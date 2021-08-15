@@ -3,13 +3,18 @@
  */
 package org.prelle.rpgframework;
 
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.PropertyResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
@@ -128,6 +133,25 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 	@Override
 	public Path getCustomDataPath(RoleplayingSystem rules) {
 		return localBaseDir.resolve(rules.name().toLowerCase());
+	}
+
+	//-------------------------------------------------------------------
+	public void setCustomText(RoleplayingSystem rules, String key, String value) {
+		Path rpgDir = getCustomDataPath(rules);
+		
+		// Help properties
+		try {
+			Path helpPath = rpgDir.resolve("fallback-help.properties");
+			Properties allKeys = new Properties();
+			if (helpPath!=null && Files.exists(helpPath)) {
+				allKeys.load(new FileReader(helpPath.toFile()));
+			}
+			allKeys.put(key, value);
+			allKeys.store(new FileWriter(helpPath.toFile()), "Modified "+Instant.now());
+		} catch (IOException e) {
+			logger.error("Failed writing updated fallback-help for "+rules,e);
+		}
+		
 	}
 
 }
