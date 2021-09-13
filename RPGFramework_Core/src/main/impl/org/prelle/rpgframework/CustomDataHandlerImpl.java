@@ -47,10 +47,35 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 
 		// Add player specific path
 		localBaseDir = FileSystems.getDefault().getPath(dataDir, "custom");
+		logger.info("Custom descriptions expected at "+localBaseDir);
 		if (!Files.exists(localBaseDir)) {
 			Files.createDirectories(localBaseDir);
 		}
 		
+		prepareCustomDescriptions(RoleplayingSystem.CORIOLIS);
+		prepareCustomDescriptions(RoleplayingSystem.SHADOWRUN6);
+		prepareCustomDescriptions(RoleplayingSystem.SPLITTERMOND);
+	}
+	
+	//------------------------------------------------------------------
+	private void prepareCustomDescriptions(RoleplayingSystem rules) {
+		Path dir = getCustomDataPath(rules);
+		Path file = dir.resolve("fallback-help.properties");
+		try {
+			if (!Files.exists(dir)) 
+				Files.createDirectories(dir);
+			
+			if (!Files.exists(file)) {
+				Properties pro = new Properties();
+				String comment = "You can use this file to define custom descriptions to skills, spells, qualities, adept powers, .... "
+						+"\nBasically any data Genesis is not allowed to provide due to license restrictions.\n"
+						+"\nSee: https://rpgframework.atlassian.net/wiki/spaces/SR6HELP/pages/420118574/Custom+descriptions"
+						+"\n\nThis file can be shared between installations of Genesis";
+				pro.store(new FileWriter(file.toFile()), comment);
+			}
+		} catch (IOException e) {
+			logger.error("Failed preparing custom descriptions: "+e);
+		}
 	}
 	
 	//------------------------------------------------------------------
