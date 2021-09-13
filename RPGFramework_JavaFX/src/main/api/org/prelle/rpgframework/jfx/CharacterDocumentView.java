@@ -3,11 +3,15 @@
  */
 package org.prelle.rpgframework.jfx;
 
+import org.prelle.javafx.AlertType;
+import org.prelle.javafx.CloseType;
 import org.prelle.javafx.ManagedScreenPage;
 import org.prelle.javafx.ResponsiveControl;
+import org.prelle.javafx.SymbolIcon;
 import org.prelle.javafx.WindowMode;
 import org.prelle.rpgframework.jfx.skin.CharacterDocumentViewPane;
 
+import de.rpgframework.ResourceI18N;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,13 +19,19 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * @author prelle
@@ -44,7 +54,9 @@ public class CharacterDocumentView extends ManagedScreenPage implements Responsi
 	private transient Label descrSubHead;
 	private transient Node  descrNode;
 	private transient VBox  descriptionBX;
+	protected transient Button descrBtnEdit;
 	private transient ScrollPane scroll;
+	private transient String currentText;
 
 	//-------------------------------------------------------------------
 	public CharacterDocumentView() {
@@ -69,11 +81,15 @@ public class CharacterDocumentView extends ManagedScreenPage implements Responsi
 		descrHead.setWrapText(true);
 		descrSubHead.setWrapText(true);
 		((Label)descrNode).setWrapText(true);
+		
+		descrBtnEdit = new Button(null,new SymbolIcon("edit"));
+//		descrBtnEdit.setVisible(false);
+//		descrBtnEdit.setManaged(false);
 	}
 
 	//-------------------------------------------------------------------
 	private void initLayout() {
-		descriptionBX = new VBox(descrHead, descrSubHead, descrNode);
+		descriptionBX = new VBox(descrHead, descrSubHead, descrBtnEdit, descrNode);
 		descriptionBX.getStyleClass().add("description-text");
 		VBox.setVgrow(descrNode, Priority.ALWAYS);
 		VBox.setMargin(descrSubHead, new Insets(0,0,20,0));
@@ -101,6 +117,52 @@ public class CharacterDocumentView extends ManagedScreenPage implements Responsi
 			}});
 		pane.pointsFreeProperty().bind(pointsFreeProperty);
 		pane.pointsNameProperty().bind(pointsNameProperty);
+		
+		descrBtnEdit.setOnAction(ev -> onEditClicked(ev));
+	}
+
+	//-------------------------------------------------------------------
+	public void onEditClicked(ActionEvent ev) {
+		TextArea ta = new TextArea(currentText);
+		if (getScreenManager()==null) {
+			Button btnOK = new Button("OK");
+			Button btnCancel = new Button("Cancel");
+			TilePane buttons = new TilePane(10,10, btnOK, btnCancel);
+			VBox layout = new VBox(20, ta, buttons);
+			
+			Scene scene = new Scene(layout);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+
+			btnOK.setOnAction( ae -> {
+				stage.close();
+				currentText = ta.getText();
+				changeCustomTextTo(currentText);
+				if (descrNode instanceof Label) {
+					((Label)descrNode).setText(currentText);
+				}
+			}); 
+			btnCancel.setOnAction( ae -> {
+				stage.close();
+			}); 
+			
+			stage.showAndWait();
+		} else {
+			String title = ResourceI18N.get( RPGFrameworkJFXConstants.UI, "dialog.enterCustom.title");
+			CloseType closed = getScreenManager().showAlertAndCall(AlertType.QUESTION, title, ta);
+			if (closed==CloseType.OK) {
+				currentText = ta.getText();
+				changeCustomTextTo(currentText);
+				if (descrNode instanceof Label) {
+					((Label)descrNode).setText(currentText);
+				}
+			}
+		}
+	}
+
+	//-------------------------------------------------------------------
+	public void changeCustomTextTo(String text) {
+		System.err.println("ToDo: overwrite CharacterDocumentView.changeCustomTextTo() in "+this.getClass());
 	}
 
 	//-------------------------------------------------------------------
@@ -174,6 +236,7 @@ public class CharacterDocumentView extends ManagedScreenPage implements Responsi
 	 */
 	@Override
 	public void setDescriptionText(String value) {
+		currentText = value;
 		descriptionBX.getChildren().remove(descrNode);
 		descriptionBX.getChildren().remove(scroll);
 		descrNode    = new Label(value);
