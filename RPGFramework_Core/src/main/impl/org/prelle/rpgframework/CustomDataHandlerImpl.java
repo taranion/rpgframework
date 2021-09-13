@@ -172,7 +172,11 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 				allKeys.load(new FileReader(helpPath.toFile()));
 			}
 			allKeys.put(key, value);
-			allKeys.store(new FileWriter(helpPath.toFile()), "Modified "+Instant.now());
+			String comment = "You can use this file to define custom descriptions to skills, spells, qualities, adept powers, .... "
+					+"\nBasically any data Genesis is not allowed to provide due to license restrictions.\n"
+					+"\nSee: https://rpgframework.atlassian.net/wiki/spaces/SR6HELP/pages/420118574/Custom+descriptions"
+					+"\n\nThis file can be shared between installations of Genesis";
+			allKeys.store(new FileWriter(helpPath.toFile()), comment);
 		} catch (IOException e) {
 			logger.error("Failed writing updated fallback-help for "+rules,e);
 		}
