@@ -83,7 +83,7 @@ public class CharacterDocumentView extends ManagedScreenPage implements Responsi
 		((Label)descrNode).setWrapText(true);
 		
 		descrBtnEdit = new Button(null,new SymbolIcon("edit"));
-//		descrBtnEdit.setVisible(false);
+		descrBtnEdit.setVisible(false);
 //		descrBtnEdit.setManaged(false);
 	}
 
