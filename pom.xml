@@ -44,7 +44,7 @@
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.skip.deploy>false</maven.skip.deploy>
 		<openjfx.version>14.0.2.1</openjfx.version>
-		<revision>4.1.0-SNAPSHOT</revision>
+		<revision>4.2.1-SNAPSHOT</revision>
 	</properties>
 
 	<dependencyManagement>
