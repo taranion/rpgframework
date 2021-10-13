@@ -2,7 +2,6 @@ package org.prelle.rpgframework.jfx.print;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +12,12 @@ import org.apache.logging.log4j.Logger;
 
 import de.rpgframework.ResourceI18N;
 import de.rpgframework.character.RuleSpecificCharacterObject;
-import de.rpgframework.core.RoleplayingSystem;
 import de.rpgframework.print.ElementCell;
 import de.rpgframework.print.LayoutGrid;
 import de.rpgframework.print.MultiRowCell;
 import de.rpgframework.print.PDFPrintElement;
 import de.rpgframework.print.PDFPrintElement.RenderingParameter;
 import de.rpgframework.print.PrintCell;
-import de.rpgframework.print.PrintTemplate;
 import de.rpgframework.print.TemplateController;
 import de.rpgframework.print.TemplateFactory;
 import javafx.application.Platform;
@@ -107,6 +104,7 @@ public class LayoutGridPane extends GridPane {
 	private void initInteractivity() {
 		setOnDragDone(ev -> logger.debug("Drag done"));
 		setOnDragDropped(ev -> logger.debug("Drag dropped"));
+		setOnDragOver(ev -> logger.debug("Drag over"));
 		this.input.addListener( (ov,o,n) -> {
 			refreshColumns();
 			refreshCells();
@@ -224,6 +222,10 @@ public class LayoutGridPane extends GridPane {
 					cell.setDisplay(iview);
 
 					lines.get(y)[x].setContent(cell);
+					if (cell.getElement()==null) {
+						cell.setElement(item);
+					}
+					
 					GridPane.setColumnSpan(lines.get(y)[x], cell.getWidth());
 					for (int i=x+1; i<(x+cell.getWidth()); i++) {
 						lines.get(y)[i].setVisible(false);

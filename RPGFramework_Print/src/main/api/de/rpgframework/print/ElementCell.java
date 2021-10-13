@@ -11,4 +11,6 @@ public interface ElementCell extends PrintCell {
 //	public void setPDFPrintElement(PDFPrintElement elem);
 	
 	public PDFPrintElement getElement();
+	public void setElement(PDFPrintElement item);
+	
 }

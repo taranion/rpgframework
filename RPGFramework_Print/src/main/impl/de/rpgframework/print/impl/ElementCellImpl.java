@@ -52,7 +52,7 @@ public class ElementCellImpl extends PrintCellImpl implements PrintCell, Element
 	@Override
 	public int getWidth() {
 		if (element==null)
-			throw new IllegalStateException("ElementCell hasn't been resolved yet");
+			throw new IllegalStateException("ElementCell("+elementReference+") hasn't been resolved yet");
 		return element.getRequiredColumns();
 	}
 
