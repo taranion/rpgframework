@@ -68,4 +68,8 @@ public interface TemplateController {
 	public boolean canPick(LayoutGrid page, PrintCell cell);
 	public void select(LayoutGrid page, ElementCell elem, int index);
 	
+	//---------------------------------------------------------
+	public boolean canSplitVertical(LayoutGrid page, PrintCell cell);
+	public void splitVertical(LayoutGrid page, PrintCell elem);
+	
 }

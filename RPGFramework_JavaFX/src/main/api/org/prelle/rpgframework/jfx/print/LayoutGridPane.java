@@ -62,6 +62,7 @@ public class LayoutGridPane extends GridPane {
 	private MenuItem miGrowHori;
 	private MenuItem miShrinkHori;
 	private MenuItem miFilter;
+	private MenuItem miSplitVert;
 	private Menu miPick;
 
 	//---------------------------------------------------------
@@ -96,6 +97,7 @@ public class LayoutGridPane extends GridPane {
 		miShrinkHori = new MenuItem(ResourceI18N.get(RES, "context.shrink.horizontal"), null);
 		miPick = new Menu(ResourceI18N.get(RES, "context.pick"), null);
 		miFilter = new MenuItem(ResourceI18N.get(RES, "context.filter"), null);
+		miSplitVert = new MenuItem(ResourceI18N.get(RES, "context.split.vertical"), null);
 	}
 
 	//---------------------------------------------------------
@@ -129,6 +131,11 @@ public class LayoutGridPane extends GridPane {
 			refreshCells();
 		});
 		miShrinkVert.setOnAction(ev -> {
+			control.shrinkVertical(getInput(), ((TemplateCell)context.getUserData()).getContent());
+			refreshCells();
+		});
+		miSplitVert.setOnAction(ev -> {
+			logger.debug("splitVerti");
 			control.shrinkVertical(getInput(), ((TemplateCell)context.getUserData()).getContent());
 			refreshCells();
 		});
@@ -376,10 +383,12 @@ public class LayoutGridPane extends GridPane {
 			}
 		} else
 		if (event.getButton()==MouseButton.SECONDARY) {
-			logger.info("SHow context");
+			logger.info("Show context");
 			PrintCell cell = templateCell.getContent();
 			context.getItems().clear();
 			context.getItems().addAll(miDelete);
+			if (control.canSplitVertical(getInput(), cell))
+				context.getItems().addAll(miSplitVert);
 			if (control.canGrowVertical(getInput(), cell))
 				context.getItems().add(miGrowVert);
 			if (control.canGrowHorizontal(getInput(), cell))

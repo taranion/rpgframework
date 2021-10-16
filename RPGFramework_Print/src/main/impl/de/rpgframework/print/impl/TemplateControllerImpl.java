@@ -298,8 +298,16 @@ public class TemplateControllerImpl implements TemplateController {
 	 */
 	@Override
 	public boolean canGrowHorizontal(LayoutGrid page, PrintCell cell) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!(cell instanceof ElementCell))
+			return false;
+
+		ElementCell eCell = (ElementCell)cell;
+		PDFPrintElement elem = eCell.getElement();
+
+		if (!elem.hasFeature(PDFPrintElementFeature.EXPAND_HORIZONTAL))
+			return false;
+
+		return true;
 	}
 
 	//-------------------------------------------------------------------
@@ -388,6 +396,27 @@ public class TemplateControllerImpl implements TemplateController {
 	public void select(LayoutGrid page, ElementCell cell, int index) {
 		logger.info("Select index "+index+" for "+cell.getElement());
 		cell.getSavedRenderOptions().setSelectedIndex(index);		
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#canSplitVertical(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public boolean canSplitVertical(LayoutGrid page, PrintCell cell) {
+		// TODO Auto-generated method stub
+		logger.warn("ToDo: canSplitVertical");
+		return false;
+	}
+
+	//-------------------------------------------------------------------
+	/**
+	 * @see de.rpgframework.print.TemplateController#splitVertical(de.rpgframework.print.LayoutGrid, de.rpgframework.print.PrintCell)
+	 */
+	@Override
+	public void splitVertical(LayoutGrid page, PrintCell elem) {
+		// TODO Auto-generated method stub
+		logger.warn("ToDo: splitVertical");
 	}
 
 }
