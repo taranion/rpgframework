@@ -100,8 +100,10 @@ public class LoadRulePluginsBootStep implements BootStep {
 			try {
 				if (plugin.getLanguages().contains(searchLang))
 					rulePlugins.add(plugin);
-				else
+				else {
 					logger.warn("Ignore plugin "+plugin.getClass()+" because language "+searchLang+" not supported (only "+plugin.getLanguages()+")");
+					CharacterProviderLoader.unregisterRulePlugin(plugin);
+				}
 			} catch (Throwable e) {
 				logger.fatal("Error instantiating plugin "+plugin,e);
 				e.printStackTrace();
