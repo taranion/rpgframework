@@ -132,8 +132,22 @@ public class BaseCharacterProviderLight implements CharacterProvider {
 			BabylonEventBus.fireEvent(BabylonEventType.CHAR_ADDED, handle);
 			return handle;
 		} else {
+			logger.warn("Trying to add an already existing character "+charDir);
 			BaseCharacterHandleLight handle = (BaseCharacterHandleLight) getCharacter(system, name);
-			logger.warn("Trying to add an already existing character");
+			if (handle==null) {
+				logger.error("Directory "+charDir+" exists, but obtaining character handle failed");
+				Path charDirFail = charDir;
+				charDir   = systemDir.resolve(name+"2");
+				Files.createDirectories(charDir);
+				logger.debug("data for "+name+" is stored in "+charDir);
+				handle = new BaseCharacterHandleLight(charDir, system);
+				handle.setName(name);
+				cache.add(handle);
+				logger.info("created handle "+handle);
+				BabylonEventBus.fireEvent(BabylonEventType.CHAR_ADDED, handle);
+				BabylonEventBus.fireEvent(BabylonEventType.UI_MESSAGE, 2, "Cannot write character - directory already exists\n"+charDirFail+"\n\nTried saving to "+charDir);
+				return handle;
+			}
 			return handle;
 		}
 	}
