@@ -145,6 +145,7 @@ public class CollectKnownRemotePluginsStep implements BootStep {
 		 * directory
 		 */
 		Path configFile = pluginDir.resolve(CONFIG_FILENAME);
+		logger.info("Expect additional update server config at "+configFile);
 		if (Files.exists(configFile)) {
 			try {
 				for (String url_s : Files.readAllLines(configFile)) {

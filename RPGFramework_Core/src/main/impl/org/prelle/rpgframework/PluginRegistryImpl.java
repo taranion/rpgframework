@@ -298,6 +298,14 @@ public class PluginRegistryImpl implements PluginRegistry {
 	//-------------------------------------------------------------------
 	public void addPluginToDeleteOnExit(PluginDescriptor desc) {
 		toDelete.add(desc);
+		if (desc.localFile==null) {
+			try {
+				throw new RuntimeException("No local file set in plugin to delete");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 }
