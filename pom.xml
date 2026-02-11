@@ -5,7 +5,7 @@
 
 	<groupId>de.rpgframework</groupId>
 	<artifactId>rpgframework-master</artifactId>
-	<version>4.2.2-SNAPSHOT</version>
+	<version>4.2.2</version>
 	<packaging>pom</packaging>
 
 	<name>RPGFramework</name>
@@ -39,12 +39,12 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<log4j.version>2.17.2</log4j.version>
+		<log4j.version>2.25.3</log4j.version>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.skip.deploy>false</maven.skip.deploy>
 		<openjfx.version>14.0.2.1</openjfx.version>
-		<revision>4.2.2-SNAPSHOT</revision>
+		<revision>4.2.2</revision>
 	</properties>
 
 	<dependencyManagement>
@@ -113,7 +113,7 @@
 			<dependency>
 				<groupId>org.prelle</groupId>
 				<artifactId>javafx-extensions</artifactId>
-				<version>[4.2.0-SNAPSHOT, 4.99.99)</version>
+				<version>4.4.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.prelle</groupId>
@@ -135,7 +135,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
+				<version>3.14.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -155,26 +155,126 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+
+            <plugin>
+               <groupId>org.sonatype.central</groupId>
+               <artifactId>central-publishing-maven-plugin</artifactId>
+               <version>0.7.0</version>
+               <extensions>true</extensions>
+               <configuration>
+                  <publishingServerId>central</publishingServerId>
+                  <deploymentName>${project.artifactId}_${project.version}</deploymentName>
+                  <autoPublish>true</autoPublish>
+               </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <failOnError>false</failOnError>
+                            <stylesheet>java</stylesheet>
+                            <docfilessubdirs>true</docfilessubdirs>
+                            <additionalOptions>
+                                -html5 -Xdoclint:syntax
+                            </additionalOptions>
+                            <detectLinks>true</detectLinks>
+                            <links>
+                                <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
+                                <link>https://openjfx.io/javadoc/12/</link>
+                            </links>
+                            <author>false</author>
+                            <sourceFileExcludes>
+                                <sourceFileExclude>**/module-info.java</sourceFileExclude>
+                            </sourceFileExcludes>
+                        </configuration>
+
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                        <configuration>
+                            <skipSource>false</skipSource>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+               <groupId>org.sonatype.central</groupId>
+               <artifactId>central-publishing-maven-plugin</artifactId>
+               <version>0.7.0</version>
+               <extensions>true</extensions>
+               <configuration>
+                  <publishingServerId>central</publishingServerId>
+                  <deploymentName>${project.artifactId}_${project.version}</deploymentName>
+                  <autoPublish>true</autoPublish>
+               </configuration>
+         </plugin>
+ 		</plugins>
 	</build>
 
-	<distributionManagement>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-			<uniqueVersion>false</uniqueVersion>
-		</repository>
-<!-- 		<repository> -->
-<!-- 			<id>GitHub</id> -->
-<!-- 			<name>GitHub Taranion Apache Maven Packages</name> -->
-<!-- 			<url>https://maven.pkg.github.com/taranion/rpgframework</url> -->
-<!-- 			<uniqueVersion>false</uniqueVersion> -->
-<!-- 		</repository> -->
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-	</distributionManagement>
+    <ciManagement>
+        <system>Bitbucket Pipelines</system>
+        <url>https://bitbucket.org/taranion/rpgframework/pipelines/</url>
+    </ciManagement>
+    <scm>
+        <connection>scm:git:git@bitbucket.org:taranion/rpgframework.git</connection>
+        <developerConnection>scm:git:git@bitbucket.org:taranion/rpgframework.git</developerConnection>
+        <url>https://bitbucket.org/taranion/rpgframework/</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
