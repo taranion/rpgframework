@@ -265,7 +265,9 @@ public class CollectKnownRemotePluginsStep implements BootStep {
 	private List<PluginDescriptor> getAvailablePlugins(List<URL> updateURLs) {
 		List<PluginDescriptor> ret = new ArrayList<>();
 		for (URL updateURL : updateURLs) {
-			ret.addAll(getPluginsAt(updateURL));
+			List<? extends PluginDescriptor> tmp = getPluginsAt(updateURL);
+			logger.info("Found "+tmp.size()+" plugins at "+updateURL);
+			ret.addAll(tmp);
 		}
 		
 		return ret;

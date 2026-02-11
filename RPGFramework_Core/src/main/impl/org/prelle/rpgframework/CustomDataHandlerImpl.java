@@ -137,9 +137,11 @@ public class CustomDataHandlerImpl implements CustomDataHandler {
 		// Help properties
 		try {
 			Path helpPath = rpgDir.resolve(identifier+"-help.properties");
-			if (helpPath!=null && Files.exists(helpPath))
+			if (helpPath!=null && Files.exists(helpPath)) {
+				logger.error("Load help "+helpPath);
+				
 				ret.helpProperties = new PropertyResourceBundle(Files.newInputStream(helpPath));
-			else if (!"fallback".equals(identifier))
+			} else if (!"fallback".equals(identifier))
 				logger.error("Expect custom data help property file "+helpPath);
 			else
 				logger.warn("Expect user provided translations in "+helpPath);

@@ -170,12 +170,14 @@ public class RPGFrameworkImpl implements RPGFramework {
 	 * Find out which version of RPGFramework has been provided
 	 */
 	private static Version detectFrameworkVersion() {
-		Version frameworkVersion = null;
-		Optional<Version> version = RPGFramework.class.getModule().getDescriptor().version();
-		if (version.isPresent()) {
-			frameworkVersion = version.get();
-		} else
-			frameworkVersion = Version.parse("4.0.0-SNAPSHOT");
+		Version frameworkVersion = Version.parse("4.0.0-SNAPSHOT");
+		if (RPGFramework.class.getModule().getDescriptor()!=null) {
+			Optional<Version> version = RPGFramework.class.getModule().getDescriptor().version();
+			if (version.isPresent()) {
+				frameworkVersion = version.get();
+			} else
+				frameworkVersion = Version.parse("4.0.0-SNAPSHOT");
+		}
 		logger.info("Framework version is "+frameworkVersion);
 		return frameworkVersion;
 	}
