@@ -52,20 +52,6 @@ public interface CharacterProvider {
 	
 	//--------------------------------------------------------------------
 	/**
-	 * Informs the user if the implementation is able to generates events.
-	 * @return TRUE if the implementation generates events for character actions
-	 */
-	public boolean firesEvents();
-	
-	//--------------------------------------------------------------------
-	/**
-	 * Used by synchronization plugins to prevent event generation when 
-	 * synchronizing from remote to local.
-	 */
-	public CharacterProvider getNonEventingStorage();
-	
-	//--------------------------------------------------------------------
-	/**
 	 * Create a new CharacterHandle as a container for attachments for the
 	 * local user. 
 	 * 
@@ -99,17 +85,17 @@ public interface CharacterProvider {
 	 */
 	public Attachment addAttachment(CharacterHandle handle, Type type, Format format, String filename, byte[] data) throws IOException;
 	
-	//--------------------------------------------------------------------
-	/**
-	 * Copy the attachment from a different character provider to this one.<br/>
-	 * This method is used for synchronization.
-	 * 
-	 * @param handle Character to modify
-	 * @param attach Attachment to copy
-	 * @return Cloned attachment
-	 * @throws IOException
-	 */
-	public Attachment copyAttachment(CharacterHandle handle, Attachment attach) throws IOException;
+//	//--------------------------------------------------------------------
+//	/**
+//	 * Copy the attachment from a different character provider to this one.<br/>
+//	 * This method is used for synchronization.
+//	 * 
+//	 * @param handle Character to modify
+//	 * @param attach Attachment to copy
+//	 * @return Cloned attachment
+//	 * @throws IOException
+//	 */
+//	public Attachment copyAttachment(CharacterHandle handle, Attachment attach) throws IOException;
 	
 	//--------------------------------------------------------------------
 	/**

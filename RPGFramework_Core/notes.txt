@@ -1,0 +1,37 @@
+Reality
+==========================================
+Player
+Group
+
+
+
+
+In-Game / Chars
+==========================================
+Character
+Adventure
+Session
+
+RoleplayingSystem
+Genre
+
+Product Data
+====================================
+Product
+Adventure Module
+Story
+
+
+Media
+===================================
+Token
+Handout
+Map
+...
+Music
+Sound Effect
+
+
+
+RPGFramework_Reality
+RPGFramework_GameMechanics
